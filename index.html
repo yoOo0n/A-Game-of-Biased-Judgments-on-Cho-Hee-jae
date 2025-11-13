@@ -39,17 +39,20 @@
           </div>
 
           <div class="control">
-            <label for="deltaInput">추가할 점수</label>
+            <label for="deltaInput">추가/차감할 점수</label>
             <input id="deltaInput" type="number" value="1"/>
             <div class="preset">
               <button class="chip small" data-delta="1">+1</button>
               <button class="chip small" data-delta="5">+5</button>
               <button class="chip small" data-delta="10">+10</button>
+              <button class="chip small" data-delta="-1">-1</button>
+              <button class="chip small" data-delta="-5">-5</button>
+              <button class="chip small" data-delta="-10">-10</button>
             </div>
           </div>
 
           <div class="control actions">
-            <button id="addBtn" class="btn primary">선택 팀에 점수 추가</button>
+            <button id="addBtn" class="btn primary">선택 팀에 점수 추가/차감</button>
             <button id="resetBtn" class="btn subtle">전체 0점으로</button>
             <button id="renameBtn" class="btn outline">팀명 다시 설정</button>
           </div>
@@ -67,6 +70,36 @@
         <div class="result-cta">
           <button id="showResultBtn" class="btn">결과 보기 (순위)</button>
           <span id="resultHint" class="hint" hidden>아래에서 확인</span>
+        </div>
+      </section>
+
+      <!-- 타이머 / 스탑워치 카드 -->
+      <section class="card">
+        <h2>타이머 / 스탑워치</h2>
+        <div class="timer">
+          <div class="timer__mode">
+            <button id="modeStopwatch" class="chip chip--active">스탑워치</button>
+            <button id="modeCountdown" class="chip">타이머</button>
+          </div>
+
+          <div id="timerDisplay" class="timer__display">00:00</div>
+
+          <div id="timerInputs" class="timer__inputs">
+            <label>
+              분
+              <input id="timerMin" type="number" min="0" value="1">
+            </label>
+            <label>
+              초
+              <input id="timerSec" type="number" min="0" max="59" value="0">
+            </label>
+          </div>
+
+          <div class="timer__controls">
+            <button id="timerStartBtn" class="btn primary">시작</button>
+            <button id="timerPauseBtn" class="btn subtle">일시정지</button>
+            <button id="timerResetBtn" class="btn outline">초기화</button>
+          </div>
         </div>
       </section>
 
@@ -177,6 +210,17 @@
     const rankList = document.getElementById('rankList');
     const gotoLadderBtn = document.getElementById('gotoLadderBtn');
 
+    // 타이머 / 스탑워치 DOM
+    const modeStopwatchBtn = document.getElementById('modeStopwatch');
+    const modeCountdownBtn = document.getElementById('modeCountdown');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerInputs = document.getElementById('timerInputs');
+    const timerMinInput = document.getElementById('timerMin');
+    const timerSecInput = document.getElementById('timerSec');
+    const timerStartBtn = document.getElementById('timerStartBtn');
+    const timerPauseBtn = document.getElementById('timerPauseBtn');
+    const timerResetBtn = document.getElementById('timerResetBtn');
+
     // 사다리 화면
     const ladderSvg = document.getElementById('ladderSvg');
     const backToMainBtn = document.getElementById('backToMainBtn');
@@ -188,6 +232,16 @@
 
     // 점수 상태
     let selectedTeamId = 1;
+
+    // 타이머 상태
+    let timerMode = 'stopwatch'; // 'stopwatch' | 'countdown'
+    let timerInterval = null;
+    let stopwatchStart = null;
+    let elapsedMs = 0;
+
+    let countdownStart = null;
+    let initialCountdownMs = 0;
+    let remainingMs = 0;
 
     // 사다리 상태
     const cols = 5;
@@ -298,6 +352,115 @@
       localStorage.removeItem(LS_NAMES_SET);
       openNameModal();
     });
+
+    // ======= 타이머 / 스탑워치 로직 =======
+    function formatTime(ms){
+      const totalSec = Math.floor(ms / 1000);
+      const min = Math.floor(totalSec / 60);
+      const sec = totalSec % 60;
+      return `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    }
+
+    function updateTimerDisplay(){
+      if (timerMode === 'stopwatch') {
+        timerDisplay.textContent = formatTime(elapsedMs);
+      } else {
+        timerDisplay.textContent = formatTime(remainingMs);
+      }
+    }
+
+    function clearTimerInterval(){
+      if (timerInterval !== null){
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function setTimerMode(mode){
+      if (timerMode === mode) return;
+      timerMode = mode;
+      clearTimerInterval();
+      elapsedMs = 0;
+      remainingMs = 0;
+      stopwatchStart = null;
+      countdownStart = null;
+      updateTimerDisplay();
+
+      if (mode === 'stopwatch'){
+        modeStopwatchBtn.classList.add('chip--active');
+        modeCountdownBtn.classList.remove('chip--active');
+        timerInputs.style.display = 'none';
+      } else {
+        modeCountdownBtn.classList.add('chip--active');
+        modeStopwatchBtn.classList.remove('chip--active');
+        timerInputs.style.display = 'flex';
+      }
+    }
+
+    modeStopwatchBtn.addEventListener('click', ()=> setTimerMode('stopwatch'));
+    modeCountdownBtn.addEventListener('click', ()=> setTimerMode('countdown'));
+
+    function startTimer(){
+      if (timerInterval !== null) return; // 이미 동작 중이면 무시
+
+      if (timerMode === 'stopwatch'){
+        const now = performance.now();
+        stopwatchStart = now - elapsedMs;
+        timerInterval = setInterval(()=>{
+          const t = performance.now();
+          elapsedMs = t - stopwatchStart;
+          updateTimerDisplay();
+        }, 50);
+      } else {
+        // countdown
+        if (remainingMs <= 0){
+          const min = Math.max(0, Number(timerMinInput.value) || 0);
+          let sec = Math.max(0, Number(timerSecInput.value) || 0);
+          if (sec > 59) sec = 59;
+          initialCountdownMs = (min * 60 + sec) * 1000;
+          remainingMs = initialCountdownMs;
+        }
+        if (remainingMs <= 0) {
+          // 0초면 동작 X
+          updateTimerDisplay();
+          return;
+        }
+        const now = performance.now();
+        countdownStart = now;
+        const startRemaining = remainingMs;
+        timerInterval = setInterval(()=>{
+          const t = performance.now();
+          const diff = t - countdownStart;
+          remainingMs = Math.max(0, startRemaining - diff);
+          updateTimerDisplay();
+          if (remainingMs <= 0){
+            clearTimerInterval();
+          }
+        }, 50);
+      }
+    }
+
+    function pauseTimer(){
+      clearTimerInterval();
+      // 현재까지 elapsedMs / remainingMs 그대로 유지
+    }
+
+    function resetTimer(){
+      clearTimerInterval();
+      elapsedMs = 0;
+      remainingMs = 0;
+      stopwatchStart = null;
+      countdownStart = null;
+      updateTimerDisplay();
+    }
+
+    timerStartBtn.addEventListener('click', startTimer);
+    timerPauseBtn.addEventListener('click', pauseTimer);
+    timerResetBtn.addEventListener('click', resetTimer);
+
+    // 초기 상태: 스탑워치 모드, 입력창 숨기기
+    timerInputs.style.display = 'none';
+    updateTimerDisplay();
 
     // ======= 화면 전환 =======
     gotoLadderBtn.addEventListener('click', ()=>{
