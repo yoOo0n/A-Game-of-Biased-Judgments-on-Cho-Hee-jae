@@ -1,0 +1,308 @@
+/* =========================================================
+   운정고 1-3반 단합게임 — styles.css (Light / Readable)
+   - 명확한 대비, 넉넉한 여백, 일관된 컴포넌트 크기
+   - 버튼/칩/입력의 포커스 가시성 강화
+   - 반응형 (모바일 우선)
+   ========================================================= */
+
+/* ---------- CSS Variables (Light theme only) ---------- */
+:root{
+  --bg-top: #f7fafc;
+  --bg-bottom: #eef2f7;
+
+  --text: #0f172a;
+  --muted: #64748b;
+
+  --primary: #0ea5e9;
+  --primary-600: #0284c7;
+
+  --card-bg: #ffffff;
+  --card-bd: #e5eaf1;
+  --ring: rgba(14,165,233,.28);
+  --shadow: 0 10px 24px rgba(2,6,23,.06);
+
+  --chip-bd: #cbd5e1;
+  --chip-bg: #fff;
+  --chip-active-bg: #0ea5e9;
+  --chip-active-fg: #fff;
+
+  --table-row-bd: #e2e8f0;
+
+  --svg-line: #94a3b8;
+  --svg-rung: #0ea5e9;
+  --path: #111827;
+
+  --gold: #fbbf24;
+  --silver: #cbd5e1;
+  --bronze: #fb923c;
+}
+
+/* ---------- Reset / Base ---------- */
+*{ box-sizing: border-box; }
+html, body{ height: 100%; }
+body{
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif;
+  color: var(--text);
+  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- Layout ---------- */
+.container{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 16px 64px;
+}
+.header h1{
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.header .sub{
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.view.hidden{ display: none; }
+
+.card{
+  background: var(--card-bg);
+  border: 1px solid var(--card-bd);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+.card h2{
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ---------- Controls ---------- */
+.controls{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+}
+.control{ display: flex; flex-direction: column; gap: 6px; }
+.control label{ font-size: 12px; color: var(--muted); }
+.control input{
+  width: 140px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--chip-bd);
+  background: #fff;
+  color: var(--text);
+}
+.control input:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--ring);
+  outline: none;
+}
+.actions{ gap: 8px; flex-direction: row; }
+
+/* ---------- Buttons ---------- */
+.btn{
+  --bg:#fff; --fg:var(--text); --bd:#cbd5e1; --bgH:#f8fafc;
+  padding: 10px 14px;
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--fg);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.btn:hover{ background: var(--bgH); transform: translateY(-1px); }
+.btn:active{ transform: translateY(0); }
+.btn:focus{ outline: none; box-shadow: 0 0 0 3px var(--ring); }
+.btn.primary{ --bg:var(--primary); --fg:#fff; --bd:var(--primary); --bgH:var(--primary-600); }
+.btn.outline{ --bg:#fff; --fg:var(--text); --bd:#cbd5e1; --bgH:#f8fafc; }
+.btn.subtle{ --bg:#f1f5f9; --fg:var(--text); --bd:#e2e8f0; --bgH:#e2e8f0; }
+.btn.large{ padding: 14px 18px; font-size: 16px; }
+
+/* ---------- Chips (team buttons & presets) ---------- */
+.team-buttons{ display: flex; gap: 8px; flex-wrap: wrap; }
+.chip{
+  border: 1px solid var(--chip-bd);
+  background: var(--chip-bg);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease;
+}
+.chip:hover{ transform: translateY(-1px); }
+.chip:focus{ outline: none; box-shadow: 0 0 0 3px var(--ring); }
+.chip.small{ padding: 6px 10px; font-size: 12px; }
+.chip.chip--active{
+  background: var(--chip-active-bg);
+  color: var(--chip-active-fg);
+  border-color: var(--chip-active-bg);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.preset{ display: flex; gap: 6px; }
+
+/* ---------- Score Table ---------- */
+.table-wrap{ margin-top: 12px; overflow-x: auto; }
+
+.score-table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+.score-table thead th{
+  text-align: left;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+  padding: 0 12px 2px;
+}
+.score-table tbody td{
+  background: #fff;
+  border: 1px solid var(--table-row-bd);
+  padding: 12px;
+}
+.score-table tbody td:first-child{ border-radius: 12px 0 0 12px; }
+.score-table tbody td:last-child{ border-radius: 0 12px 12px 0; font-weight: 800; }
+.score{ font-variant-numeric: tabular-nums; }
+
+/* ---------- Result CTA ---------- */
+.result-cta{ margin-top: 14px; display: flex; gap: 10px; align-items: center; }
+.hint{ color: var(--muted); font-size: 14px; }
+
+/* ---------- Rank List (Readable & Bold) ---------- */
+.rank-list{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.rank-list li{
+  position: relative;
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid var(--card-bd);
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, .06);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.rank-list li:hover{ transform: translateY(-2px); box-shadow: 0 14px 28px rgba(15,23,42,.10); }
+.rank-list li::before{
+  content: "";
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 6px; border-radius: 14px 0 0 14px;
+  background: linear-gradient(180deg, #a3bffa 0%, #c7d2fe 100%);
+}
+.rank-list .badge{
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 999px;
+  font-weight: 900; font-size: 14px;
+  color: var(--text);
+  background: #eef2ff;
+  border: 1px solid #e0e7ff;
+}
+.rank-list li span:nth-of-type(2){ font-weight: 700; }
+.rank-list .pts{
+  margin-left: auto; color: #475569;
+  font-variant-numeric: tabular-nums; font-weight: 700;
+}
+/* 1~3위 강조색 */
+.rank-list li:nth-child(1)::before{ background: linear-gradient(180deg, var(--gold) 0%, #f59e0b 100%); }
+.rank-list li:nth-child(2)::before{ background: linear-gradient(180deg, var(--silver) 0%, #e2e8f0 100%); }
+.rank-list li:nth-child(3)::before{ background: linear-gradient(180deg, var(--bronze) 0%, #ea580c 100%); }
+
+/* ---------- Ladder SVG ---------- */
+.svg-wrap{
+  background: #fff;
+  border: 1px solid var(--card-bd);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.svg-wrap.clickable{ cursor: pointer; }
+.svg-top{ fill: var(--text); font-size: 12px; }
+.svg-bottom{ fill: var(--muted); font-size: 12px; }
+.path{
+  stroke: var(--path);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---------- Ladder Panels ---------- */
+.two-col{ display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 12px; }
+@media (min-width: 560px){ .two-col{ grid-template-columns: 1fr 1fr; } }
+
+.mini-card{
+  background: #fff;
+  border: 1px solid var(--card-bd);
+  border-radius: 12px;
+  padding: 12px;
+}
+.ordered-list{ margin: 0; padding-left: 18px; }
+.ordered-list li{ display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+
+/* ---------- Mapping Grid ---------- */
+.mapping-grid{ display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; }
+.map-cell{
+  background: #fff;
+  border: 1px solid var(--card-bd);
+  border-radius: 10px;
+  padding: 8px;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(2,6,23,.05);
+}
+.map-name{ font-size: 11px; color: var(--muted); }
+.map-arrow{ font-weight: 800; }
+
+/* ---------- Modal ---------- */
+.modal{
+  position: fixed; inset: 0;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(2,6,23,.40);
+  padding: 16px; z-index: 50;
+}
+.modal.show{ display: flex; }
+.modal__card{
+  width: 100%; max-width: 440px;
+  background: #fff;
+  border: 1px solid var(--card-bd);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 20px 40px rgba(2,6,23,.25);
+}
+.modal__title{ margin: 0 0 6px; font-size: 20px; font-weight: 800; }
+.modal__subtitle{ margin: 0 0 12px; color: var(--muted); }
+.modal__step{ display: grid; gap: 6px; }
+.modal__step label{ font-size: 12px; color: var(--muted); }
+.modal__step input{
+  padding: 12px; border-radius: 12px; border: 1px solid var(--chip-bd);
+  background: #fff; color: var(--text);
+}
+.modal__step input:focus{ border-color: var(--primary); box-shadow: 0 0 0 3px var(--ring); outline: none; }
+.modal__actions{ display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+
+/* ---------- Ladder header/control ---------- */
+.ladder__header{ display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ladder__actions{ display: flex; gap: 8px; }
+.ladder__controls{ display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+
+/* ---------- Focus visible (접근성) ---------- */
+:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring) !important;
+  border-radius: 12px;
+}

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>운정고 1-3반 단합게임</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <!-- 팀명 입력 모달 -->
+  <div id="nameModal" class="modal">
+    <div class="modal__card">
+      <h2 class="modal__title">1–5팀의 팀명을 입력하세요</h2>
+      <p class="modal__subtitle">하나씩 입력하고 다음 버튼을 눌러주세요.</p>
+      <div class="modal__step">
+        <label id="nameLabel" for="teamNameInput">팀 1 이름</label>
+        <input id="teamNameInput" type="text" placeholder="예: 썬더"/>
+      </div>
+      <div class="modal__actions">
+        <button id="nameNextBtn" class="btn primary">다음</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header class="header">
+      <h1>운정고 1-3반 단합게임</h1>
+    </header>
+
+    <!-- 점수 화면 -->
+    <main id="mainView" class="view">
+      <section class="card">
+        <h2>점수 관리</h2>
+
+        <div class="controls">
+          <div class="control">
+            <label>팀 선택</label>
+            <div id="teamButtons" class="team-buttons"></div>
+          </div>
+
+          <div class="control">
+            <label for="deltaInput">추가할 점수</label>
+            <input id="deltaInput" type="number" value="1"/>
+            <div class="preset">
+              <button class="chip small" data-delta="1">+1</button>
+              <button class="chip small" data-delta="5">+5</button>
+              <button class="chip small" data-delta="10">+10</button>
+            </div>
+          </div>
+
+          <div class="control actions">
+            <button id="addBtn" class="btn primary">선택 팀에 점수 추가</button>
+            <button id="resetBtn" class="btn subtle">전체 0점으로</button>
+            <button id="renameBtn" class="btn outline">팀명 다시 설정</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="score-table">
+            <thead>
+              <tr><th>팀</th><th>점수</th></tr>
+            </thead>
+            <tbody id="scoreTable"></tbody>
+          </table>
+        </div>
+
+        <div class="result-cta">
+          <button id="showResultBtn" class="btn">결과 보기 (순위)</button>
+          <span id="resultHint" class="hint" hidden>아래에서 확인</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>사다리타기 이동</h2>
+        <p class="hint">점수 집계가 끝났다면 아래 버튼을 눌러 사다리 화면으로 이동하세요.</p>
+        <button id="gotoLadderBtn" class="btn primary large">사다리타기 하러가기 →</button>
+      </section>
+
+      <section class="card">
+        <h2>최종 순위 (점수 기준)</h2>
+        <div id="rankEmpty" class="hint">"결과 보기"를 누르면 순위가 표시됩니다.</div>
+        <ol id="rankList" class="rank-list" hidden></ol>
+      </section>
+    </main>
+
+    <!-- 사다리 화면 -->
+    <main id="ladderView" class="view hidden">
+      <section class="card">
+        <div class="ladder__header">
+          <h2>사다리타기 (1→5팀이 차례로 진행)</h2>
+          <div class="ladder__actions">
+            <button id="backToMainBtn" class="btn outline">← 점수 화면</button>
+            <button id="regenBtn" class="btn subtle">사다리 새로 만들기</button>
+          </div>
+        </div>
+
+        <div class="svg-wrap clickable" title="클릭하면 다음 팀이 이동합니다">
+          <svg id="ladderSvg" width="760" height="560" role="img" aria-label="사다리"></svg>
+        </div>
+
+        <div class="ladder__controls">
+          <button id="stepBtn" class="btn primary">다음 팀 진행 (클릭/스페이스 가능)</button>
+          <span id="ladderHint" class="hint">현재 대기: 팀 1</span>
+        </div>
+
+        <div class="two-col">
+          <div class="mini-card">
+            <h3>도착 순서 (왼→오)</h3>
+            <ol id="ladderOrder" class="ordered-list"></ol>
+          </div>
+          <div class="mini-card">
+            <h3>매핑 (출발 열 → 도착 열)</h3>
+            <div id="mappingGrid" class="mapping-grid"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ============ LocalStorage keys ============
+    const LS_TEAMS = 'teams';
+    const LS_NAMES_SET = 'teamNamesSet';
+
+    // ============ 데이터 & 상태 ============
+    const teams = [
+      { id: 1, name: '팀 1', score: 0 },
+      { id: 2, name: '팀 2', score: 0 },
+      { id: 3, name: '팀 3', score: 0 },
+      { id: 4, name: '팀 4', score: 0 },
+      { id: 5, name: '팀 5', score: 0 },
+    ];
+
+    // 저장된 데이터 로드
+    (function loadFromStorage(){
+      const saved = localStorage.getItem(LS_TEAMS);
+      if (saved) {
+        try {
+          const arr = JSON.parse(saved);
+          if (Array.isArray(arr) && arr.length === 5) {
+            for (let i=0;i<5;i++){
+              if (arr[i]) {
+                teams[i].name  = String(arr[i].name ?? teams[i].name);
+                teams[i].score = Number(arr[i].score ?? 0);
+              }
+            }
+          }
+        } catch {}
+      }
+    })();
+
+    function saveToStorage(){
+      localStorage.setItem(LS_TEAMS, JSON.stringify(teams));
+    }
+
+    // ========= DOM 캐시 =========
+    const mainView = document.getElementById('mainView');
+    const ladderView = document.getElementById('ladderView');
+
+    // 모달
+    const nameModal = document.getElementById('nameModal');
+    const nameLabel = document.getElementById('nameLabel');
+    const teamNameInput = document.getElementById('teamNameInput');
+    const nameNextBtn = document.getElementById('nameNextBtn');
+    let nameStep = 1;
+
+    // 점수 화면
+    const teamButtonsWrap = document.getElementById('teamButtons');
+    const deltaInput = document.getElementById('deltaInput');
+    const addBtn = document.getElementById('addBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const renameBtn = document.getElementById('renameBtn');
+    const scoreTableBody = document.querySelector('tbody#scoreTable');
+    const showResultBtn = document.getElementById('showResultBtn');
+    const resultHint = document.getElementById('resultHint');
+    const rankEmpty = document.getElementById('rankEmpty');
+    const rankList = document.getElementById('rankList');
+    const gotoLadderBtn = document.getElementById('gotoLadderBtn');
+
+    // 사다리 화면
+    const ladderSvg = document.getElementById('ladderSvg');
+    const backToMainBtn = document.getElementById('backToMainBtn');
+    const regenBtn = document.getElementById('regenBtn');
+    const stepBtn = document.getElementById('stepBtn');
+    const ladderHint = document.getElementById('ladderHint');
+    const ladderOrder = document.getElementById('ladderOrder');
+    const mappingGrid = document.getElementById('mappingGrid');
+
+    // 점수 상태
+    let selectedTeamId = 1;
+
+    // 사다리 상태
+    const cols = 5;
+    const width = 760, height = 560;
+    const paddingX = 60, topY = 20, bottomY = height - 20;
+    const colGap = (width - paddingX * 2) / (cols - 1);
+    const xPositions = Array.from({length: cols}, (_,i)=> paddingX + i*colGap);
+    let rungs = [], paths = [];
+    let animIdx = -1, currentStarter = 0, progress = 0, rafId = null;
+
+    // ======= 모달 로직 (팀명 1→5 입력) =======
+    function openNameModal(){
+      nameStep = 1;
+      teamNameInput.value = '';
+      nameLabel.textContent = `팀 ${nameStep} 이름`;
+      nameModal.classList.add('show');
+      teamNameInput.focus();
+    }
+    function closeNameModal(){ nameModal.classList.remove('show'); }
+
+    function commitName(){
+      const name = teamNameInput.value.trim();
+      if(!name) return;
+      teams[nameStep-1].name = name;
+      saveToStorage();
+      nameStep++;
+      if(nameStep <= 5){
+        teamNameInput.value = '';
+        nameLabel.textContent = `팀 ${nameStep} 이름`;
+        teamNameInput.focus();
+        renderTeamButtons(); renderScores();
+      }else{
+        closeNameModal();
+        localStorage.setItem(LS_NAMES_SET, 'true');
+        renderTeamButtons(); renderScores(); buildLadder();
+      }
+    }
+    nameNextBtn.addEventListener('click', commitName);
+    teamNameInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter') commitName(); });
+
+    if(localStorage.getItem(LS_NAMES_SET) === 'true'){
+      nameModal.classList.remove('show'); // 저장된 이름 활용
+    }else{
+      openNameModal();
+    }
+
+    // ======= 점수 로직 =======
+    function renderTeamButtons(){
+      teamButtonsWrap.innerHTML = '';
+      teams.forEach(t=>{
+        const btn = document.createElement('button');
+        btn.className = 'chip' + (t.id===selectedTeamId ? ' chip--active':'');
+        btn.textContent = t.name;
+        btn.addEventListener('click', ()=>{ selectedTeamId = t.id; renderTeamButtons(); });
+        teamButtonsWrap.appendChild(btn);
+      });
+    }
+
+    function renderScores(){
+      scoreTableBody.innerHTML = '';
+      teams.forEach(t=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${t.name}</td><td class="score">${t.score}</td>`;
+        scoreTableBody.appendChild(tr);
+      });
+    }
+
+    function addScore(){
+      const val = Number(deltaInput.value);
+      const team = teams.find(x=>x.id===selectedTeamId);
+      if(!team) return;
+      team.score += Number.isFinite(val) ? val : 0;
+      saveToStorage();
+      renderScores();
+    }
+
+    function resetScores(){
+      teams.forEach(t=> t.score = 0);
+      saveToStorage();
+      renderScores();
+      hideRanking();
+    }
+
+    function showRanking(){
+      const sorted = [...teams].sort((a,b)=> b.score - a.score || a.id - b.id);
+      rankList.innerHTML = '';
+      sorted.forEach((t,i)=>{
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="badge">${i+1}</span> <span>${t.name}</span> <span class="pts">${t.score}점</span>`;
+        rankList.appendChild(li);
+      });
+      rankEmpty.hidden = true; rankList.hidden = false; resultHint.hidden = false;
+    }
+    function hideRanking(){ rankList.hidden=false; rankList.hidden=true; rankEmpty.hidden=false; resultHint.hidden=true; }
+
+    // 프리셋 클릭
+    document.addEventListener('click', (e)=>{
+      const el = e.target.closest('[data-delta]');
+      if(!el) return;
+      deltaInput.value = el.getAttribute('data-delta');
+    });
+
+    // 버튼 이벤트
+    addBtn.addEventListener('click', addScore);
+    resetBtn.addEventListener('click', resetScores);
+    showResultBtn.addEventListener('click', showRanking);
+    renameBtn.addEventListener('click', ()=>{
+      localStorage.removeItem(LS_NAMES_SET);
+      openNameModal();
+    });
+
+    // ======= 화면 전환 =======
+    gotoLadderBtn.addEventListener('click', ()=>{
+      mainView.classList.add('hidden');
+      ladderView.classList.remove('hidden');
+      drawLadder(); updateLadderPanels();
+      currentStarter = 0; animIdx = -1; progress = 0; updateLadderHint();
+    });
+    backToMainBtn.addEventListener('click', ()=>{
+      ladderView.classList.add('hidden');
+      mainView.classList.remove('hidden');
+      stopAnim();
+    });
+
+    // ======= 사다리 생성/계산 =======
+    function generateRungs({ cols, height, minGap=28, density=0.16 }){
+      const all = [];
+      const maxRungs = Math.floor((height*density)/2)+12;
+      for(let c=0;c<cols-1;c++){
+        const local=[]; let tries=0;
+        while(local.length < Math.floor(maxRungs/(cols-1)) && tries<2000){
+          tries++;
+          const y = 40 + Math.random()*(height-80);
+          if(local.every(yy=> Math.abs(yy-y)>=minGap)) local.push(y);
+        }
+        local.sort((a,b)=>a-b);
+        local.forEach(y=> all.push({y, leftCol:c}));
+      }
+      all.sort((a,b)=> a.y - b.y || a.leftCol - b.leftCol);
+      const filtered=[];
+      for(let i=0;i<all.length;i++){
+        const cur=all[i], prev=filtered[filtered.length-1];
+        if(!prev || Math.abs(prev.y-cur.y)>8 || Math.abs(prev.leftCol-cur.leftCol)>1) filtered.push(cur);
+      }
+      return filtered;
+    }
+
+    function computeMapping(cols, r){
+      return Array.from({length: cols}, (_,start)=>{
+        let col=start;
+        for(const rung of r){
+          if(rung.leftCol===col) col=col+1;
+          else if(rung.leftCol+1===col) col=col-1;
+        }
+        return col;
+      });
+    }
+
+    function pathForStart(start){
+      let col=start; const pts=[{x:xPositions[col], y:topY}];
+      for(const rung of rungs){
+        const y=rung.y; pts.push({x:xPositions[col], y});
+        if(rung.leftCol===col){ pts.push({x:xPositions[col+1], y}); col=col+1; }
+        else if(rung.leftCol+1===col){ pts.push({x:xPositions[col-1], y}); col=col-1; }
+      }
+      pts.push({x:xPositions[col], y:bottomY});
+      return pts;
+    }
+
+    // ======= 사다리 렌더링 =======
+    function drawLadder(){
+      ladderSvg.innerHTML='';
+      // 라벨
+      xPositions.forEach((x,i)=>{
+        const top = document.createElementNS('http://www.w3.org/2000/svg','text');
+        top.setAttribute('x',x); top.setAttribute('y',16); top.setAttribute('text-anchor','middle');
+        top.setAttribute('class','svg-top'); top.textContent = teams[i].name; ladderSvg.appendChild(top);
+
+        const bottom = document.createElementNS('http://www.w3.org/2000/svg','text');
+        bottom.setAttribute('x',x); bottom.setAttribute('y',height-6); bottom.setAttribute('text-anchor','middle');
+        bottom.setAttribute('class','svg-bottom'); bottom.textContent = `출발 ${i+1}`; ladderSvg.appendChild(bottom);
+      });
+      // 세로줄
+      xPositions.forEach((x)=>{
+        const v = document.createElementNS('http://www.w3.org/2000/svg','line');
+        v.setAttribute('x1',x); v.setAttribute('x2',x); v.setAttribute('y1',topY); v.setAttribute('y2',bottomY);
+        v.setAttribute('stroke','#94a3b8'); v.setAttribute('stroke-width','3');
+        ladderSvg.appendChild(v);
+      });
+      // 가로줄
+      rungs.forEach(r=>{
+        const h = document.createElementNS('http://www.w3.org/2000/svg','line');
+        h.setAttribute('x1',xPositions[r.leftCol]); h.setAttribute('x2',xPositions[r.leftCol+1]);
+        h.setAttribute('y1',r.y); h.setAttribute('y2',r.y);
+        h.setAttribute('stroke','#0ea5e9'); h.setAttribute('stroke-width','4'); h.setAttribute('stroke-linecap','round');
+        ladderSvg.appendChild(h);
+      });
+    }
+
+    function drawProgressPolyline(points){
+      const poly = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+      poly.setAttribute('fill','none'); poly.setAttribute('class','path');
+      poly.setAttribute('points', points.map(p=>`${p.x},${p.y}`).join(' '));
+      ladderSvg.appendChild(poly);
+      return poly;
+    }
+
+    function updateLadderPanels(){
+      const mapping = computeMapping(cols, rungs);
+      // 매핑 그리드
+      mappingGrid.innerHTML='';
+      mapping.forEach((endCol, start)=>{
+        const cell = document.createElement('div');
+        cell.className='map-cell';
+        cell.innerHTML = `<div class="map-name">${teams[start].name}</div><div class="map-arrow">${start+1} → ${endCol+1}</div>`;
+        mappingGrid.appendChild(cell);
+      });
+      // 도착 순서(왼→오)
+      const pairs = Array.from({length:cols},(_,start)=>({start, end:mapping[start]}));
+      pairs.sort((a,b)=> a.end - b.end);
+      ladderOrder.innerHTML='';
+      pairs.forEach((p,rank)=>{
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="rank">${rank+1}</span> <span>${teams[p.start].name}</span>`;
+        ladderOrder.appendChild(li);
+      });
+    }
+
+    // ======= 한 팀씩 애니메이션 =======
+    function updateLadderHint(){
+      ladderHint.textContent = currentStarter < cols ? `현재 대기: ${teams[currentStarter].name}` : '완료! 모두 이동했습니다.';
+    }
+
+    function startOneRun(){
+      if(currentStarter >= cols) return;
+      if(animIdx !== -1) return;
+      animIdx = currentStarter; progress = 0; tick.t0 = null; tick();
+    }
+
+    function stopAnim(){ cancelAnimationFrame(rafId); animIdx=-1; progress=0; drawLadder(); }
+
+    function tick(ts){
+      const DUR = 1200;
+      if(animIdx < 0) return;
+      if(!tick.t0) tick.t0 = ts || performance.now();
+      const dt = (ts || performance.now()) - tick.t0;
+      progress = Math.min(1, dt / DUR);
+      drawLadder();
+      const pts = polylineProgressPoints(paths[animIdx], progress);
+      drawProgressPolyline(pts);
+      if(progress >= 1){
+        tick.t0 = null; animIdx = -1; currentStarter++;
+        updateLadderPanels(); updateLadderHint();
+        return;
+      }
+      rafId = requestAnimationFrame(tick);
+    }
+
+    stepBtn.addEventListener('click', startOneRun);
+    ladderSvg.addEventListener('click', startOneRun);
+    document.addEventListener('keydown', (e)=>{
+      if(!ladderView.classList.contains('hidden') && e.code==='Space'){
+        e.preventDefault(); startOneRun();
+      }
+    });
+
+    // ======= 초기화/재생성 =======
+    function polylineProgressPoints(points, p){
+      if(!points || points.length<2) return points||[];
+      const segLens=[]; let total=0;
+      for(let i=0;i<points.length-1;i++){
+        const dx=points[i+1].x-points[i].x, dy=points[i+1].y-points[i].y;
+        const L=Math.hypot(dx,dy); segLens.push(L); total+=L;
+      }
+      const target = total*p; let acc=0; const out=[points[0]];
+      for(let i=0;i<segLens.length;i++){
+        const L=segLens[i], a=points[i], b=points[i+1];
+        if(acc+L<=target){ out.push(b); acc+=L; }
+        else { const r=Math.max(0,Math.min(1,(target-acc)/L));
+          out.push({x:a.x+(b.x-a.x)*r, y:a.y+(b.y-a.y)*r}); break; }
+      }
+      return out;
+    }
+
+    function buildLadder(){
+      rungs = generateRungs({ cols, height: height-40, density: 0.16 });
+      paths = Array.from({length: cols}, (_,s)=> pathForStart(s));
+      drawLadder(); updateLadderPanels();
+      currentStarter = 0; updateLadderHint();
+    }
+    regenBtn.addEventListener('click', ()=>{ stopAnim(); buildLadder(); });
+
+    // ======= 최초 렌더 =======
+    renderTeamButtons(); renderScores(); buildLadder();
+  </script>
+</body>
+</html>
