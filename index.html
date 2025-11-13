@@ -25,10 +25,10 @@
   <div class="page">
     <header class="header">
       <h1>운정고 1-3반 단합게임</h1>
-      <p class="header__sub">점수 관리 + 타이머 + 사다리타기</p>
+      <p class="header__sub">점수 관리 · 타이머 · 사다리타기</p>
     </header>
 
-    <!-- 메인 뷰 (점수 / 타이머 / 순위) -->
+    <!-- 메인 화면 (점수 / 타이머 / 순위) -->
     <main id="mainView" class="view">
       <!-- 점수 카드 -->
       <section class="card card--scores">
@@ -54,7 +54,7 @@
           </div>
 
           <div class="control control--actions">
-            <button id="btnAddScore" class="btn primary">선택 팀에 점수 적용</button>
+            <button id="btnAddScore" class="btn primary">선택 팀 점수 적용</button>
             <button id="btnResetScore" class="btn subtle">점수 전부 0점</button>
             <button id="btnRenameTeams" class="btn outline">팀명 다시 설정</button>
           </div>
@@ -74,7 +74,7 @@
 
         <div class="result-row">
           <button id="btnShowRank" class="btn">결과 보기 (순위)</button>
-          <span id="rankHint" class="hint is-hidden">아래 “최종 순위”에서 확인하세요</span>
+          <span id="rankHint" class="hint is-hidden">아래 “최종 순위”에서 확인하세요.</span>
         </div>
       </section>
 
@@ -88,7 +88,14 @@
             <button id="modeCountdown" class="chip chip--mode">타이머</button>
           </div>
 
-          <div id="timerDisplay" class="timer__display">00:00.000</div>
+          <!-- 0.01초 단위, 초 부분 크게 -->
+          <div id="timerDisplay" class="timer__display">
+            <span class="timer-min"   id="tmMin">00</span>
+            <span class="timer-colon">:</span>
+            <span class="timer-sec"   id="tmSec">00</span>
+            <span class="timer-dot">.</span>
+            <span class="timer-centi" id="tmCenti">00</span>
+          </div>
 
           <div id="timerInputRow" class="timer__input-row">
             <label>
@@ -109,12 +116,12 @@
         </div>
 
         <div class="goto-ladder">
-          <p class="hint">점수 정리 후, 사다리타기로 순서를 정해보세요!</p>
+          <p class="hint">점수 정리가 끝났다면, 아래 버튼으로 사다리타기로 넘어가세요.</p>
           <button id="btnGotoLadder" class="btn primary btn--full">사다리타기 하러 가기 →</button>
         </div>
       </section>
 
-      <!-- 최종 순위 카드 -->
+      <!-- 순위 카드 -->
       <section class="card card--rank">
         <h2>최종 순위 (점수 기준)</h2>
         <div id="rankEmpty" class="hint">“결과 보기 (순위)” 버튼을 누르면 순위가 나타납니다.</div>
@@ -122,13 +129,13 @@
       </section>
     </main>
 
-    <!-- 사다리 뷰 -->
+    <!-- 사다리 화면 -->
     <main id="ladderView" class="view is-hidden">
       <section class="card card--ladder">
         <div class="ladder__header">
           <div>
             <h2>사다리타기</h2>
-            <p class="hint">1~5 열에서 출발해 어디로 도착하는지 확인해보세요.</p>
+            <p class="hint">SVG 사다리를 따라 팀별로 한 칸씩 내려가요.</p>
           </div>
           <div class="ladder__header-actions">
             <button id="btnBackMain" class="btn outline">← 점수 화면</button>
@@ -160,24 +167,23 @@
   </div>
 
   <!-- ====================
-       자바스크립트
+       JavaScript
   ===================== -->
   <script>
-    // ---- LocalStorage 키 ----
+    // ===== LocalStorage 키 =====
     const LS_KEY_TEAMS = 'u13_teams';
     const LS_KEY_NAMES_SET = 'u13_teamNamesSet';
-
     const TEAM_COUNT = 5;
 
-    // ---- 팀 데이터 ----
+    // ===== 팀 데이터 =====
     const teams = Array.from({ length: TEAM_COUNT }, (_, i) => ({
       id: i + 1,
-      name: `팀 ${i + 1}`,
+      name: '팀 ' + (i + 1),
       score: 0,
     }));
 
-    // ---- 저장된 데이터 불러오기 ----
-    (function loadTeamsFromStorage() {
+    // 저장된 팀 정보 불러오기
+    (function loadTeams() {
       const saved = localStorage.getItem(LS_KEY_TEAMS);
       if (!saved) return;
       try {
@@ -189,16 +195,14 @@
             if (typeof t.score === 'number') teams[idx].score = t.score;
           });
         }
-      } catch (e) {
-        // 파싱 실패 시 무시
-      }
+      } catch (e) {}
     })();
 
     function saveTeams() {
       localStorage.setItem(LS_KEY_TEAMS, JSON.stringify(teams));
     }
 
-    // ---- 공통 DOM 캐시 ----
+    // ===== 공통 DOM =====
     const mainView = document.getElementById('mainView');
     const ladderView = document.getElementById('ladderView');
 
@@ -207,7 +211,7 @@
     const teamModalLabel = document.getElementById('teamModalLabel');
     const teamNameInput = document.getElementById('teamNameInput');
     const teamModalNext = document.getElementById('teamModalNext');
-    let modalStep = 0; // 0~4 사용
+    let modalStep = 0; // 0~4
 
     // 점수 / 순위 DOM
     const teamChipWrap = document.getElementById('teamChipWrap');
@@ -231,8 +235,12 @@
     const btnTimerStart = document.getElementById('btnTimerStart');
     const btnTimerPause = document.getElementById('btnTimerPause');
     const btnTimerReset = document.getElementById('btnTimerReset');
-
     const btnGotoLadder = document.getElementById('btnGotoLadder');
+
+    // 타이머 숫자 DOM
+    const tmMinEl   = document.getElementById('tmMin');
+    const tmSecEl   = document.getElementById('tmSec');
+    const tmCentiEl = document.getElementById('tmCenti');
 
     // 사다리 DOM
     const ladderSvg = document.getElementById('ladderSvg');
@@ -243,19 +251,19 @@
     const ladderOrder = document.getElementById('ladderOrder');
     const mappingGrid = document.getElementById('mappingGrid');
 
-    // ---- 점수 상태 ----
+    // ===== 점수 상태 =====
     let selectedTeamId = 1;
 
-    // ---- 타이머 상태 ----
+    // ===== 타이머 상태 (0.01초 단위) =====
     let timerMode = 'stopwatch'; // 'stopwatch' | 'countdown'
     let timerInterval = null;
-    let elapsedMs = 0;           // 스탑워치에서 사용
-    let remainingMs = 0;         // 타이머에서 사용
+    let elapsedMs = 0;           // 스탑워치
+    let remainingMs = 0;         // 카운트다운
     let stopwatchStart = null;
     let countdownStart = null;
     let initialCountdownMs = 0;
 
-    // ---- 사다리 상태 ----
+    // ===== 사다리 상태 =====
     const LADDER_COLS = 5;
     const LADDER_WIDTH = 760;
     const LADDER_HEIGHT = 560;
@@ -267,7 +275,7 @@
 
     let rungs = [];
     let paths = [];
-    let currentStarter = 0; // 0~4
+    let currentStarter = 0;
     let currentAnimIndex = -1;
     let progress = 0;
     let rafId = null;
@@ -277,7 +285,7 @@
     // =========================
     function openTeamModal() {
       modalStep = 0;
-      updateModalLabel();
+      teamModalLabel.textContent = '팀 1 이름';
       teamNameInput.value = '';
       teamModal.classList.add('is-open');
       setTimeout(() => teamNameInput.focus(), 0);
@@ -285,10 +293,6 @@
 
     function closeTeamModal() {
       teamModal.classList.remove('is-open');
-    }
-
-    function updateModalLabel() {
-      teamModalLabel.textContent = `팀 ${modalStep + 1} 이름`;
     }
 
     function submitTeamName() {
@@ -300,14 +304,14 @@
       modalStep += 1;
       if (modalStep < TEAM_COUNT) {
         teamNameInput.value = '';
-        updateModalLabel();
+        teamModalLabel.textContent = `팀 ${modalStep + 1} 이름`;
         teamNameInput.focus();
         renderTeamChips();
         renderScoreTable();
-        drawLadder();   // 팀 이름이 바뀌면 상단 라벨도 갱신
+        drawLadder();
       } else {
-        closeTeamModal();
         localStorage.setItem(LS_KEY_NAMES_SET, '1');
+        closeTeamModal();
         renderTeamChips();
         renderScoreTable();
         buildLadder();
@@ -326,7 +330,7 @@
     }
 
     // =========================
-    // 점수 관련 렌더링
+    // 점수 렌더링 / 로직
     // =========================
     function renderTeamChips() {
       teamChipWrap.innerHTML = '';
@@ -359,7 +363,7 @@
       if (!team) return;
       const delta = Number(scoreDeltaInput.value);
       const validDelta = Number.isFinite(delta) ? delta : 0;
-      team.score += validDelta;
+      team.score += validDelta;      // 마이너스 허용
       saveTeams();
       renderScoreTable();
     }
@@ -394,7 +398,7 @@
       rankHint.classList.add('is-hidden');
     }
 
-    // 프리셋 점수 버튼
+    // 점수 프리셋 버튼
     document.addEventListener('click', (e) => {
       const el = e.target.closest('[data-delta]');
       if (!el) return;
@@ -410,26 +414,25 @@
     });
 
     // =========================
-    // 타이머 / 스탑워치
+    // 타이머 / 스탑워치 (0.01초 단위)
     // =========================
-    function formatTime(ms) {
-      const totalMs = Math.max(0, Math.floor(ms));
-      const totalSec = Math.floor(totalMs / 1000);
+    function setTimerFromMs(ms) {
+      const safeMs = Math.max(0, Math.floor(ms));
+      const totalSec = Math.floor(safeMs / 1000);
       const min = Math.floor(totalSec / 60);
       const sec = totalSec % 60;
-      const milli = totalMs % 1000;
+      const centi = Math.floor((safeMs % 1000) / 10); // 0~99
 
-      const mm = String(min).padStart(2, '0');
-      const ss = String(sec).padStart(2, '0');
-      const mmm = String(milli).padStart(3, '0');
-      return `${mm}:${ss}.${mmm}`;
+      tmMinEl.textContent   = String(min).padStart(2, '0');
+      tmSecEl.textContent   = String(sec).padStart(2, '0');
+      tmCentiEl.textContent = String(centi).padStart(2, '0');
     }
 
     function updateTimerDisplay() {
       if (timerMode === 'stopwatch') {
-        timerDisplay.textContent = formatTime(elapsedMs);
+        setTimerFromMs(elapsedMs);
       } else {
-        timerDisplay.textContent = formatTime(remainingMs);
+        setTimerFromMs(remainingMs);
       }
     }
 
@@ -470,11 +473,12 @@
       if (timerMode === 'stopwatch') {
         const now = performance.now();
         stopwatchStart = now - elapsedMs;
+
         timerInterval = setInterval(() => {
           const t = performance.now();
           elapsedMs = t - stopwatchStart;
-          updateTimerDisplay();
-        }, 16); // ~60fps
+          updateTimerDisplay();  // 0.01초 단위
+        }, 10);
       } else {
         if (remainingMs <= 0) {
           const min = Math.max(0, Number(timerMinInput.value) || 0);
@@ -487,9 +491,11 @@
           updateTimerDisplay();
           return;
         }
+
         const now = performance.now();
         countdownStart = now;
         const startRemaining = remainingMs;
+
         timerInterval = setInterval(() => {
           const t = performance.now();
           const diff = t - countdownStart;
@@ -498,7 +504,7 @@
           if (remainingMs <= 0) {
             clearTimerInterval();
           }
-        }, 16);
+        }, 10);
       }
     }
 
@@ -523,7 +529,7 @@
     updateTimerDisplay();
 
     // =========================
-    // 화면 전환
+    // 화면 전환 (메인 ↔ 사다리)
     // =========================
     btnGotoLadder.addEventListener('click', () => {
       mainView.classList.add('is-hidden');
@@ -541,7 +547,7 @@
     });
 
     // =========================
-    // 사다리 생성 & 계산
+    // 사다리 생성 / 계산
     // =========================
     function generateRungs({ cols, height, minGap = 28, density = 0.16 }) {
       const all = [];
@@ -578,8 +584,8 @@
       return Array.from({ length: cols }, (_, start) => {
         let col = start;
         for (const rung of r) {
-          if (rung.leftCol === col) col = col + 1;
-          else if (rung.leftCol + 1 === col) col = col - 1;
+          if (rung.leftCol === col) col++;
+          else if (rung.leftCol + 1 === col) col--;
         }
         return col;
       });
@@ -593,10 +599,10 @@
         pts.push({ x: X_POSITIONS[col], y });
         if (rung.leftCol === col) {
           pts.push({ x: X_POSITIONS[col + 1], y });
-          col = col + 1;
+          col++;
         } else if (rung.leftCol + 1 === col) {
           pts.push({ x: X_POSITIONS[col - 1], y });
-          col = col - 1;
+          col--;
         }
       }
       pts.push({ x: X_POSITIONS[col], y: BOTTOM_Y });
@@ -637,50 +643,50 @@
     }
 
     // =========================
-    // 사다리 렌더링
+    // 사다리 렌더링 / 애니메이션
     // =========================
     function drawLadder() {
       ladderSvg.innerHTML = '';
 
-      // 상단 팀 이름
+      // 상단 / 하단 라벨
       X_POSITIONS.forEach((x, i) => {
-        const textTop = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        textTop.setAttribute('x', x);
-        textTop.setAttribute('y', 18);
-        textTop.setAttribute('text-anchor', 'middle');
-        textTop.setAttribute('class', 'svg-top-label');
-        textTop.textContent = teams[i].name;
-        ladderSvg.appendChild(textTop);
+        const topText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        topText.setAttribute('x', x);
+        topText.setAttribute('y', 20);
+        topText.setAttribute('text-anchor', 'middle');
+        topText.setAttribute('class', 'svg-top-label');
+        topText.textContent = teams[i].name;
+        ladderSvg.appendChild(topText);
 
-        const textBottom = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        textBottom.setAttribute('x', x);
-        textBottom.setAttribute('y', LADDER_HEIGHT - 6);
-        textBottom.setAttribute('text-anchor', 'middle');
-        textBottom.setAttribute('class', 'svg-bottom-label');
-        textBottom.textContent = `출발 ${i + 1}`;
-        ladderSvg.appendChild(textBottom);
+        const bottomText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        bottomText.setAttribute('x', x);
+        bottomText.setAttribute('y', LADDER_HEIGHT - 8);
+        bottomText.setAttribute('text-anchor', 'middle');
+        bottomText.setAttribute('class', 'svg-bottom-label');
+        bottomText.textContent = '출발 ' + (i + 1);
+        ladderSvg.appendChild(bottomText);
       });
 
       // 세로줄
       X_POSITIONS.forEach((x) => {
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', x);
-        line.setAttribute('x2', x);
-        line.setAttribute('y1', TOP_Y);
-        line.setAttribute('y2', BOTTOM_Y);
-        line.setAttribute('class', 'svg-vertical');
-        ladderSvg.appendChild(line);
+        const v = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        v.setAttribute('x1', x);
+        v.setAttribute('x2', x);
+        v.setAttribute('y1', TOP_Y);
+        v.setAttribute('y2', BOTTOM_Y);
+        v.setAttribute('class', 'svg-vertical');
+        ladderSvg.appendChild(v);
       });
 
       // 가로줄
       rungs.forEach(r => {
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', X_POSITIONS[r.leftCol]);
-        line.setAttribute('x2', X_POSITIONS[r.leftCol + 1]);
-        line.setAttribute('y1', r.y);
-        line.setAttribute('y2', r.y);
-        line.setAttribute('class', 'svg-rung');
-        ladderSvg.appendChild(line);
+        const h = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        h.setAttribute('x1', X_POSITIONS[r.leftCol]);
+        h.setAttribute('x2', X_POSITIONS[r.leftCol + 1]);
+        h.setAttribute('y1', r.y);
+        h.setAttribute('y2', r.y);
+        h.setAttribute('class', 'svg-rung');
+        ladderSvg.appendChild(h);
       });
     }
 
@@ -726,11 +732,10 @@
       if (currentStarter >= LADDER_COLS) {
         ladderHint.textContent = '모든 팀 이동 완료!';
       } else {
-        ladderHint.textContent = `현재 대기: ${teams[currentStarter].name}`;
+        ladderHint.textContent = '현재 대기: ' + teams[currentStarter].name;
       }
     }
 
-    // ---- 애니메이션 ----
     function stopLadderAnim() {
       cancelAnimationFrame(rafId);
       currentAnimIndex = -1;
@@ -793,9 +798,7 @@
       updateLadderPanels();
     }
 
-    // =========================
-    // 최초 렌더링
-    // =========================
+    // ===== 최초 렌더 =====
     renderTeamChips();
     renderScoreTable();
     buildLadder();
