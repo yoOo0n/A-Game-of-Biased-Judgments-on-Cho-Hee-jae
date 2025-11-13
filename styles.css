@@ -1,6 +1,6 @@
-/* =====================
-   기본 스타일
-===================== */
+/* =======================
+   기본값 / 컬러 토큰
+======================= */
 *,
 *::before,
 *::after {
@@ -8,113 +8,129 @@
 }
 
 :root {
-  --bg-gradient: radial-gradient(circle at top, #0f9cf5 0%, #020617 55%, #020617 100%);
-  --card-bg: rgba(15, 23, 42, 0.92);
-  --card-border: rgba(148, 163, 184, 0.4);
+  --bg: #020617;
+  --bg-gradient: radial-gradient(circle at top, #0ea5e9 0%, #020617 58%, #000 100%);
+  --card-bg: rgba(15, 23, 42, 0.96);
+  --card-border: rgba(148, 163, 184, 0.6);
   --accent: #38bdf8;
-  --accent-soft: rgba(56, 189, 248, 0.25);
   --accent-strong: #0ea5e9;
-  --accent-glow: 0 0 18px rgba(56, 189, 248, 0.65);
-  --danger: #fb7185;
-  --success: #4ade80;
-  --text-main: #e5f0ff;
+  --accent-soft: rgba(56, 189, 248, 0.18);
+  --accent-glow: 0 0 22px rgba(56, 189, 248, 0.9);
+  --text-main: #e5edff;
   --text-muted: #9ca3af;
-  --surface-soft: rgba(15, 23, 42, 0.7);
-  --radius-lg: 18px;
-  --radius-xl: 24px;
-  --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.85);
-  --shadow-chip: 0 0 0 1px rgba(148, 163, 184, 0.35);
-  --transition-fast: 0.15s ease-out;
-  --transition-medium: 0.2s ease;
+  --danger: #fb7185;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+  --shadow-card: 0 20px 60px rgba(15, 23, 42, 0.95);
+  --shadow-soft: 0 12px 32px rgba(15, 23, 42, 0.9);
 }
 
+/* =======================
+   전역 스타일
+======================= */
 html,
 body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    "Noto Sans KR", sans-serif;
-  background: #020617;
-  color: var(--text-main);
 }
 
 body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Noto Sans KR", sans-serif;
+  background-color: var(--bg);
   background-image: var(--bg-gradient);
   background-attachment: fixed;
+  color: var(--text-main);
 }
 
-/* =====================
-   레이아웃
-===================== */
-.container {
+.page {
   max-width: 1200px;
   margin: 0 auto;
   padding: 28px 16px 40px;
 }
 
+/* =======================
+   헤더
+======================= */
 .header {
   text-align: center;
   margin-bottom: 24px;
 }
 
 .header h1 {
-  font-size: 2rem;
-  letter-spacing: 0.04em;
-  color: #eff6ff;
-  text-shadow: 0 0 18px rgba(56, 189, 248, 0.65),
-    0 0 40px rgba(37, 99, 235, 0.8);
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+  font-size: 2.1rem;
+  letter-spacing: 0.05em;
   display: inline-block;
+  margin: 0;
+  padding: 6px 14px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(191, 219, 254, 0.7);
+  box-shadow:
+    0 0 20px rgba(56, 189, 248, 0.8),
+    0 18px 40px rgba(15, 23, 42, 0.95);
+  background: radial-gradient(circle at top, rgba(56, 189, 248, 0.2), rgba(15, 23, 42, 1));
 }
 
+.header__sub {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* =======================
+   레이아웃
+======================= */
 .view {
   display: grid;
-  grid-template-columns: minmax(0, 2fr);
   gap: 20px;
 }
 
-.view.hidden {
+.view.is-hidden {
   display: none;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 980px) {
   #mainView.view {
     grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
     grid-template-rows: auto auto;
   }
 
-  #mainView.view > section:nth-child(1) {
+  .card--scores {
     grid-column: 1 / 3;
   }
 
-  #mainView.view > section:nth-child(2),
-  #mainView.view > section:nth-child(3) {
-    align-self: start;
+  .card--timer {
+    grid-column: 1 / 2;
+  }
+
+  .card--rank {
+    grid-column: 2 / 3;
   }
 }
 
-/* =====================
+/* =======================
    카드
-===================== */
+======================= */
 .card {
+  position: relative;
   background: var(--card-bg);
   border-radius: var(--radius-xl);
   border: 1px solid var(--card-border);
-  box-shadow: var(--shadow-soft);
-  padding: 20px 18px 18px;
-  backdrop-filter: blur(20px);
-  position: relative;
+  box-shadow: var(--shadow-card);
+  padding: 18px 18px 16px;
   overflow: hidden;
+  backdrop-filter: blur(22px);
 }
 
 .card::before {
   content: "";
   position: absolute;
   inset: -40%;
-  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 60%);
-  opacity: 0.7;
+  background:
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.25), transparent 65%),
+    radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.28), transparent 65%);
+  opacity: 0.9;
   pointer-events: none;
 }
 
@@ -125,7 +141,7 @@ body {
 
 .card h2 {
   margin: 0 0 12px;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -133,21 +149,146 @@ body {
 
 .card h2::before {
   content: "";
-  width: 7px;
-  height: 18px;
+  width: 8px;
+  height: 20px;
   border-radius: 999px;
   background: linear-gradient(180deg, #38bdf8, #2563eb);
   box-shadow: var(--accent-glow);
 }
 
-/* =====================
-   컨트롤 / 폼
-===================== */
+/* =======================
+   기본 요소 / 유틸
+======================= */
+.is-hidden {
+  display: none !important;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* 버튼 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.95);
+  color: var(--text-main);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.1s ease-out, box-shadow 0.18s ease-out,
+    background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  white-space: nowrap;
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  border-color: transparent;
+  color: #f9fafb;
+  box-shadow: var(--accent-glow);
+}
+
+.btn.subtle {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: rgba(148, 163, 184, 0.6);
+  color: var(--text-muted);
+}
+
+.btn.outline {
+  background: transparent;
+  border-color: rgba(148, 163, 184, 0.9);
+}
+
+.btn--full {
+  width: 100%;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* 칩 */
+.chip {
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.98);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background-color 0.16s ease, border-color 0.16s ease,
+    color 0.16s ease, transform 0.1s ease-out, box-shadow 0.16s ease;
+  box-shadow: 0 0 0 1px rgba(30, 64, 175, 0.4);
+}
+
+.chip--small {
+  padding: 4px 10px;
+  font-size: 0.78rem;
+}
+
+.chip--active {
+  background: radial-gradient(circle at top, #38bdf8, #0f172a);
+  border-color: var(--accent-strong);
+  color: #f9fafb;
+  box-shadow: var(--accent-glow);
+}
+
+.chip:hover {
+  background: rgba(15, 23, 42, 0.98);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* 입력 */
+input[type="number"],
+input[type="text"] {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.98);
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus {
+  border-color: var(--accent);
+  background: rgba(15, 23, 42, 0.99);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5);
+}
+
+/* =======================
+   점수 카드
+======================= */
 .controls {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 2fr);
-  gap: 16px 20px;
-  margin-bottom: 18px;
+  gap: 14px 20px;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 720px) {
+  .controls {
+    grid-template-columns: minmax(0, 1.9fr) minmax(0, 2fr);
+  }
 }
 
 .control {
@@ -161,144 +302,35 @@ body {
   color: var(--text-muted);
 }
 
-.control.actions {
-  grid-column: 1 / -1;
+.control--actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
-input[type="number"],
-input[type="text"] {
-  background: rgba(15, 23, 42, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  border-radius: 999px;
-  padding: 8px 12px;
-  font-size: 0.9rem;
-  color: var(--text-main);
-  outline: none;
-  transition: border-color var(--transition-fast),
-    box-shadow var(--transition-fast), background-color var(--transition-fast);
-}
-
-input[type="number"]:focus,
-input[type="text"]:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3);
-  background: rgba(15, 23, 42, 0.98);
-}
-
-/* =====================
-   버튼 / 칩
-===================== */
-.btn {
-  border-radius: 999px;
-  border: none;
-  padding: 8px 15px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  background: rgba(15, 23, 42, 0.9);
-  color: var(--text-main);
-  border: 1px solid rgba(148, 163, 184, 0.5);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: background-color var(--transition-fast),
-    border-color var(--transition-fast), transform 0.1s ease-out,
-    box-shadow var(--transition-fast), color var(--transition-fast);
-  white-space: nowrap;
-}
-
-.btn.primary {
-  background: linear-gradient(135deg, #0ea5e9, #2563eb);
-  border-color: transparent;
-  color: white;
-  box-shadow: var(--accent-glow);
-}
-
-.btn.subtle {
-  background: rgba(15, 23, 42, 0.85);
-  border-color: rgba(148, 163, 184, 0.5);
-  color: var(--text-muted);
-}
-
-.btn.outline {
-  background: transparent;
-  border-color: rgba(148, 163, 184, 0.75);
-}
-
-.btn.large {
-  font-size: 1rem;
-  padding: 10px 20px;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.8);
-}
-
-.btn.primary:hover {
-  filter: brightness(1.05);
-}
-
-.btn:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-.chip {
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  background: rgba(15, 23, 42, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  color: var(--text-muted);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  box-shadow: var(--shadow-chip);
-  transition: background-color var(--transition-fast),
-    border-color var(--transition-fast), color var(--transition-fast),
-    transform 0.1s ease-out;
-}
-
-.chip.small {
-  padding: 4px 10px;
-  font-size: 0.78rem;
-}
-
-.chip:hover {
-  background: rgba(15, 23, 42, 1);
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: translateY(-0.5px);
-}
-
-.chip--active {
-  background: radial-gradient(circle at top, #38bdf8 0%, #0f172a 70%);
-  border-color: var(--accent-strong);
-  color: white;
-  box-shadow: var(--accent-glow);
-}
-
-/* 팀 버튼 래퍼 */
-.team-buttons {
+.chip-row {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-/* =====================
-   점수 테이블
-===================== */
+.preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* 팀 칩 전용 */
+.chip--team {
+  font-weight: 500;
+}
+
+/* 점수 테이블 */
 .table-wrap {
-  margin-top: 10px;
-  border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.5);
+  margin-top: 8px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
   overflow: hidden;
   background: linear-gradient(
     135deg,
@@ -314,82 +346,152 @@ input[type="text"]:focus {
 }
 
 .score-table thead {
-  background: linear-gradient(90deg, #0f172a, rgba(15, 23, 42, 0.9));
+  background: linear-gradient(90deg, rgba(15, 23, 42, 1), rgba(15, 23, 42, 0.9));
 }
 
 .score-table th,
 .score-table td {
   padding: 8px 12px;
-  text-align: left;
 }
 
 .score-table th {
-  font-weight: 600;
+  text-align: left;
   color: #cbd5f5;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.6);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.9);
+  font-weight: 600;
 }
 
 .score-table tbody tr:nth-child(odd) {
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(15, 23, 42, 0.96);
 }
 
 .score-table tbody tr:nth-child(even) {
-  background: rgba(15, 23, 42, 0.98);
+  background: rgba(15, 23, 42, 0.99);
 }
 
 .score-table tbody tr:hover {
   background: rgba(15, 23, 42, 1);
 }
 
-.score-table td.score {
+.score-cell {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-/* =====================
-   힌트 / CTA
-===================== */
-.result-cta {
-  margin-top: 14px;
+/* 결과 버튼 줄 */
+.result-row {
+  margin-top: 12px;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.hint {
+/* =======================
+   타이머 카드
+======================= */
+.card--timer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.timer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.timer__mode-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip--mode {
+  min-width: 90px;
+  justify-content: center;
+}
+
+.timer__display {
+  font-variant-numeric: tabular-nums;
+  font-size: 3.1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 12px 16px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top, rgba(56, 189, 248, 0.35), rgba(15, 23, 42, 0.98));
+  border: 1px solid rgba(191, 219, 254, 0.9);
+  box-shadow:
+    0 0 22px rgba(56, 189, 248, 0.8),
+    0 18px 40px rgba(15, 23, 42, 0.98);
+}
+
+.timer__input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.timer__input-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   font-size: 0.8rem;
   color: var(--text-muted);
 }
 
-/* =====================
-   순위 (화려하게)
-===================== */
+.timer__input-row input {
+  width: 80px;
+  text-align: center;
+}
+
+.timer__btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.goto-ladder {
+  margin-top: 6px;
+}
+
+/* =======================
+   순위 카드 (화려하게)
+======================= */
+.card--rank {
+  position: relative;
+}
+
 .rank-list {
   list-style: none;
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   padding: 10px;
-  border-radius: 18px;
+  border-radius: 20px;
   background:
-    radial-gradient(circle at top left, rgba(56, 189, 248, 0.2), transparent 55%),
-    radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.25), transparent 55%),
-    linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.92));
-  box-shadow: 0 0 25px rgba(56, 189, 248, 0.4),
-    0 18px 40px rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(191, 219, 254, 0.6);
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.2), transparent 60%),
+    radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.3), transparent 60%),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.94));
+  border: 1px solid rgba(191, 219, 254, 0.8);
+  box-shadow:
+    0 0 30px rgba(56, 189, 248, 0.7),
+    0 18px 46px rgba(15, 23, 42, 0.98);
   position: relative;
   overflow: hidden;
+  animation: rankPulse 3s ease-in-out infinite;
 }
 
 .rank-list::before {
   content: "RANKING";
   position: absolute;
   right: -40px;
-  top: 10px;
-  font-size: 2.5rem;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  color: rgba(15, 23, 42, 0.5);
-  text-shadow: 0 0 18px rgba(15, 23, 42, 0.9);
+  top: 8px;
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  color: rgba(15, 23, 42, 0.7);
+  text-shadow: 0 0 18px rgba(15, 23, 42, 0.95);
   pointer-events: none;
 }
 
@@ -398,15 +500,14 @@ input[type="text"]:focus {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 10px;
+  margin-bottom: 8px;
   padding: 8px 12px;
   border-radius: 999px;
-  margin-bottom: 6px;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  color: #e5edff;
-  font-size: 0.9rem;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.9);
   position: relative;
   overflow: hidden;
+  font-size: 0.9rem;
 }
 
 .rank-list li:last-child {
@@ -419,111 +520,110 @@ input[type="text"]:focus {
   inset: 0;
   background: linear-gradient(
     120deg,
-    rgba(56, 189, 248, 0.1),
+    rgba(56, 189, 248, 0.3),
     transparent 45%,
     transparent 55%,
-    rgba(56, 189, 248, 0.1)
+    rgba(56, 189, 248, 0.3)
   );
-  transform: translateX(-120%);
+  transform: translateX(-130%);
   opacity: 0;
   transition: transform 0.6s ease-out, opacity 0.6s ease-out;
 }
 
 .rank-list li:hover::after {
-  transform: translateX(120%);
+  transform: translateX(130%);
   opacity: 1;
 }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.rank-badge {
   width: 26px;
   height: 26px;
   border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #0b1120;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 800;
   background: #e5e7eb;
-  box-shadow: 0 0 10px rgba(148, 163, 184, 0.7);
-}
-
-/* 1~3등 강조 */
-.rank-list li:nth-child(1) .badge {
-  background: linear-gradient(135deg, #facc15, #f97316);
-  box-shadow: 0 0 14px rgba(251, 191, 36, 0.9);
-  color: #451a03;
-}
-
-.rank-list li:nth-child(2) .badge {
-  background: linear-gradient(135deg, #e5e7eb, #9ca3af);
-  box-shadow: 0 0 14px rgba(209, 213, 219, 0.9);
   color: #020617;
+  box-shadow: 0 0 12px rgba(148, 163, 184, 0.9);
 }
 
-.rank-list li:nth-child(3) .badge {
+/* 1~3등 특별 색상 */
+.rank-list li:nth-child(1) .rank-badge {
+  background: linear-gradient(135deg, #facc15, #f97316);
+  color: #451a03;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.95);
+}
+
+.rank-list li:nth-child(2) .rank-badge {
+  background: linear-gradient(135deg, #e5e7eb, #9ca3af);
+  color: #020617;
+  box-shadow: 0 0 14px rgba(229, 231, 235, 0.9);
+}
+
+.rank-list li:nth-child(3) .rank-badge {
   background: linear-gradient(135deg, #fed7aa, #fb923c);
-  box-shadow: 0 0 14px rgba(248, 153, 71, 0.9);
   color: #431407;
+  box-shadow: 0 0 14px rgba(248, 153, 71, 0.95);
 }
 
-.rank-list li span:nth-child(2) {
+.rank-team {
   font-weight: 500;
 }
 
-.rank-list .pts {
+.rank-score {
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
   color: #bfdbfe;
   text-shadow: 0 0 8px rgba(56, 189, 248, 0.9);
+  font-weight: 600;
 }
 
-/* 살짝 반짝이는 애니메이션 */
+/* 순위 카드 반짝임 */
 @keyframes rankPulse {
   0% {
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4),
-      0 18px 40px rgba(15, 23, 42, 0.9);
+    box-shadow:
+      0 0 24px rgba(56, 189, 248, 0.6),
+      0 18px 46px rgba(15, 23, 42, 0.98);
   }
   50% {
-    box-shadow: 0 0 32px rgba(56, 189, 248, 0.9),
-      0 18px 45px rgba(15, 23, 42, 1);
+    box-shadow:
+      0 0 40px rgba(56, 189, 248, 0.95),
+      0 22px 54px rgba(15, 23, 42, 1);
   }
   100% {
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4),
-      0 18px 40px rgba(15, 23, 42, 0.9);
+    box-shadow:
+      0 0 24px rgba(56, 189, 248, 0.6),
+      0 18px 46px rgba(15, 23, 42, 0.98);
   }
 }
 
-.rank-list {
-  animation: rankPulse 3s ease-in-out infinite;
-}
-
-/* =====================
+/* =======================
    모달
-===================== */
+======================= */
 .modal {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.95));
   display: none;
   align-items: center;
   justify-content: center;
+  background: radial-gradient(circle at top, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.96));
   z-index: 50;
 }
 
-.modal.show {
+.modal.is-open {
   display: flex;
 }
 
 .modal__card {
-  background: var(--surface-soft);
-  border-radius: 22px;
-  padding: 20px 22px 18px;
-  border: 1px solid rgba(148, 163, 184, 0.8);
+  position: relative;
   max-width: 360px;
   width: 100%;
-  box-shadow: 0 22px 55px rgba(15, 23, 42, 0.95);
-  position: relative;
+  background: rgba(15, 23, 42, 0.98);
+  border-radius: 24px;
+  padding: 18px 20px 16px;
+  border: 1px solid rgba(191, 219, 254, 0.9);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 1);
   overflow: hidden;
 }
 
@@ -531,8 +631,7 @@ input[type="text"]:focus {
   content: "";
   position: absolute;
   inset: -40%;
-  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.35), transparent 60%);
-  opacity: 0.9;
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.45), transparent 70%);
   pointer-events: none;
 }
 
@@ -543,20 +642,20 @@ input[type="text"]:focus {
 
 .modal__title {
   margin: 0 0 6px;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
 }
 
 .modal__subtitle {
   margin: 0 0 10px;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
 }
 
 .modal__step {
-  margin-bottom: 12px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  margin-bottom: 12px;
 }
 
 .modal__actions {
@@ -564,20 +663,13 @@ input[type="text"]:focus {
   justify-content: flex-end;
 }
 
-/* =====================
-   사다리 화면
-===================== */
-.svg-wrap {
-  margin-top: 10px;
-  border-radius: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  background: radial-gradient(circle at top, rgba(56, 189, 248, 0.1), rgba(15, 23, 42, 0.98));
-  box-shadow: var(--shadow-soft);
-  overflow: hidden;
-}
-
-.svg-wrap.clickable {
-  cursor: pointer;
+/* =======================
+   사다리
+======================= */
+.card--ladder {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .ladder__header {
@@ -585,64 +677,83 @@ input[type="text"]:focus {
   justify-content: space-between;
   gap: 10px;
   align-items: center;
-  margin-bottom: 8px;
 }
 
-.ladder__actions {
+.ladder__header-actions {
   display: flex;
   gap: 6px;
 }
 
-.ladder__controls {
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.svg-wrap {
+  margin-top: 6px;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.8);
+  background: radial-gradient(circle at top, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 1));
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  cursor: pointer;
 }
 
-.two-col {
-  margin-top: 14px;
+.ladder__controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.ladder__bottom-grid {
+  margin-top: 12px;
   display: grid;
   gap: 12px;
 }
 
-@media (min-width: 800px) {
-  .two-col {
+@media (min-width: 840px) {
+  .ladder__bottom-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 .mini-card {
-  background: rgba(15, 23, 42, 0.95);
   border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.8);
+  background: rgba(15, 23, 42, 0.98);
   padding: 10px 12px;
-  border: 1px solid rgba(148, 163, 184, 0.7);
-  font-size: 0.85rem;
+  font-size: 0.84rem;
 }
 
 .mini-card h3 {
   margin: 0 0 6px;
   font-size: 0.9rem;
-  color: #e5edff;
 }
 
-/* 사다리 텍스트 / 경로 */
-.svg-top {
+/* SVG 요소 */
+.svg-top-label {
   font-size: 0.78rem;
   fill: #e5edff;
 }
 
-.svg-bottom {
-  font-size: 0.74rem;
+.svg-bottom-label {
+  font-size: 0.75rem;
   fill: #9ca3af;
 }
 
-.path {
+.svg-vertical {
+  stroke: #93c5fd;
+  stroke-width: 3;
+}
+
+.svg-rung {
+  stroke: #0ea5e9;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.svg-path {
   stroke: #22c55e;
   stroke-width: 4;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.9));
+  filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.9));
 }
 
 /* 매핑 그리드 */
@@ -657,12 +768,12 @@ input[type="text"]:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(15, 23, 42, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.9);
   font-size: 0.8rem;
 }
 
-.map-name {
+.map-team {
   font-weight: 500;
 }
 
@@ -674,85 +785,32 @@ input[type="text"]:focus {
 /* 도착 순서 리스트 */
 .ordered-list {
   margin: 0;
-  padding-left: 16px;
-  font-size: 0.85rem;
+  padding-left: 18px;
+  font-size: 0.84rem;
 }
 
 .ordered-list li {
   margin-bottom: 4px;
 }
 
-/* =====================
-   타이머 / 스탑워치
-===================== */
-.timer {
-  margin-top: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.order-rank {
+  font-weight: 600;
+  color: #bfdbfe;
 }
 
-.timer__mode {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.timer__display {
-  font-variant-numeric: tabular-nums;
-  font-size: 2.1rem;
-  font-weight: 700;
-  text-align: center;
-  padding: 8px 10px;
-  border-radius: 20px;
-  background: radial-gradient(circle at top, rgba(56, 189, 248, 0.25), rgba(15, 23, 42, 0.95));
-  border: 1px solid rgba(191, 219, 254, 0.7);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.9),
-    0 0 20px rgba(56, 189, 248, 0.7);
-}
-
-.timer__inputs {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.timer__inputs label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.timer__inputs input {
-  width: 70px;
-  text-align: center;
-}
-
-.timer__controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* =====================
-   기타
-===================== */
+/* =======================
+   반응형
+======================= */
 @media (max-width: 640px) {
   .card {
     padding: 16px 14px 14px;
   }
 
-  .controls {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .header h1 {
-    font-size: 1.6rem;
+    font-size: 1.7rem;
   }
 
   .timer__display {
-    font-size: 1.8rem;
+    font-size: 2.5rem;
   }
 }

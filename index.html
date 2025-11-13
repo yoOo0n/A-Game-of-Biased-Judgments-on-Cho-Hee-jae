@@ -8,83 +8,89 @@
 </head>
 <body>
   <!-- 팀명 입력 모달 -->
-  <div id="nameModal" class="modal">
+  <div id="teamModal" class="modal">
     <div class="modal__card">
-      <h2 class="modal__title">1–5팀의 팀명을 입력하세요</h2>
-      <p class="modal__subtitle">하나씩 입력하고 다음 버튼을 눌러주세요.</p>
+      <h2 class="modal__title">1–5팀 팀명을 정해주세요</h2>
+      <p class="modal__subtitle">하나씩 입력하고 “다음” 버튼을 눌러요.</p>
       <div class="modal__step">
-        <label id="nameLabel" for="teamNameInput">팀 1 이름</label>
-        <input id="teamNameInput" type="text" placeholder="예: 썬더"/>
+        <label id="teamModalLabel" for="teamNameInput">팀 1 이름</label>
+        <input id="teamNameInput" type="text" placeholder="예: 썬더팀" />
       </div>
       <div class="modal__actions">
-        <button id="nameNextBtn" class="btn primary">다음</button>
+        <button id="teamModalNext" class="btn primary">다음</button>
       </div>
     </div>
   </div>
 
-  <div class="container">
+  <div class="page">
     <header class="header">
       <h1>운정고 1-3반 단합게임</h1>
+      <p class="header__sub">점수 관리 + 타이머 + 사다리타기</p>
     </header>
 
-    <!-- 점수 화면 -->
+    <!-- 메인 뷰 (점수 / 타이머 / 순위) -->
     <main id="mainView" class="view">
-      <section class="card">
-        <h2>점수 관리</h2>
+      <!-- 점수 카드 -->
+      <section class="card card--scores">
+        <h2>팀 점수 관리</h2>
 
         <div class="controls">
           <div class="control">
             <label>팀 선택</label>
-            <div id="teamButtons" class="team-buttons"></div>
+            <div id="teamChipWrap" class="chip-row"></div>
           </div>
 
           <div class="control">
-            <label for="deltaInput">추가/차감할 점수</label>
-            <input id="deltaInput" type="number" value="1"/>
-            <div class="preset">
-              <button class="chip small" data-delta="1">+1</button>
-              <button class="chip small" data-delta="5">+5</button>
-              <button class="chip small" data-delta="10">+10</button>
-              <button class="chip small" data-delta="-1">-1</button>
-              <button class="chip small" data-delta="-5">-5</button>
-              <button class="chip small" data-delta="-10">-10</button>
+            <label for="scoreDelta">추가 / 차감할 점수</label>
+            <input id="scoreDelta" type="number" value="1" />
+            <div class="preset-row">
+              <button class="chip chip--small" data-delta="1">+1</button>
+              <button class="chip chip--small" data-delta="5">+5</button>
+              <button class="chip chip--small" data-delta="10">+10</button>
+              <button class="chip chip--small" data-delta="-1">-1</button>
+              <button class="chip chip--small" data-delta="-5">-5</button>
+              <button class="chip chip--small" data-delta="-10">-10</button>
             </div>
           </div>
 
-          <div class="control actions">
-            <button id="addBtn" class="btn primary">선택 팀에 점수 추가/차감</button>
-            <button id="resetBtn" class="btn subtle">전체 0점으로</button>
-            <button id="renameBtn" class="btn outline">팀명 다시 설정</button>
+          <div class="control control--actions">
+            <button id="btnAddScore" class="btn primary">선택 팀에 점수 적용</button>
+            <button id="btnResetScore" class="btn subtle">점수 전부 0점</button>
+            <button id="btnRenameTeams" class="btn outline">팀명 다시 설정</button>
           </div>
         </div>
 
         <div class="table-wrap">
           <table class="score-table">
             <thead>
-              <tr><th>팀</th><th>점수</th></tr>
+              <tr>
+                <th>팀</th>
+                <th>점수</th>
+              </tr>
             </thead>
-            <tbody id="scoreTable"></tbody>
+            <tbody id="scoreTableBody"></tbody>
           </table>
         </div>
 
-        <div class="result-cta">
-          <button id="showResultBtn" class="btn">결과 보기 (순위)</button>
-          <span id="resultHint" class="hint" hidden>아래에서 확인</span>
+        <div class="result-row">
+          <button id="btnShowRank" class="btn">결과 보기 (순위)</button>
+          <span id="rankHint" class="hint is-hidden">아래 “최종 순위”에서 확인하세요</span>
         </div>
       </section>
 
       <!-- 타이머 / 스탑워치 카드 -->
-      <section class="card">
-        <h2>타이머 / 스탑워치</h2>
+      <section class="card card--timer">
+        <h2>타이머 · 스탑워치</h2>
+
         <div class="timer">
-          <div class="timer__mode">
-            <button id="modeStopwatch" class="chip chip--active">스탑워치</button>
-            <button id="modeCountdown" class="chip">타이머</button>
+          <div class="timer__mode-row">
+            <button id="modeStopwatch" class="chip chip--mode chip--active">스탑워치</button>
+            <button id="modeCountdown" class="chip chip--mode">타이머</button>
           </div>
 
-          <div id="timerDisplay" class="timer__display">00:00</div>
+          <div id="timerDisplay" class="timer__display">00:00.000</div>
 
-          <div id="timerInputs" class="timer__inputs">
+          <div id="timerInputRow" class="timer__input-row">
             <label>
               분
               <input id="timerMin" type="number" min="0" value="1">
@@ -95,54 +101,57 @@
             </label>
           </div>
 
-          <div class="timer__controls">
-            <button id="timerStartBtn" class="btn primary">시작</button>
-            <button id="timerPauseBtn" class="btn subtle">일시정지</button>
-            <button id="timerResetBtn" class="btn outline">초기화</button>
+          <div class="timer__btn-row">
+            <button id="btnTimerStart" class="btn primary">시작</button>
+            <button id="btnTimerPause" class="btn subtle">일시정지</button>
+            <button id="btnTimerReset" class="btn outline">초기화</button>
           </div>
+        </div>
+
+        <div class="goto-ladder">
+          <p class="hint">점수 정리 후, 사다리타기로 순서를 정해보세요!</p>
+          <button id="btnGotoLadder" class="btn primary btn--full">사다리타기 하러 가기 →</button>
         </div>
       </section>
 
-      <section class="card">
-        <h2>사다리타기 이동</h2>
-        <p class="hint">점수 집계가 끝났다면 아래 버튼을 눌러 사다리 화면으로 이동하세요.</p>
-        <button id="gotoLadderBtn" class="btn primary large">사다리타기 하러가기 →</button>
-      </section>
-
-      <section class="card">
+      <!-- 최종 순위 카드 -->
+      <section class="card card--rank">
         <h2>최종 순위 (점수 기준)</h2>
-        <div id="rankEmpty" class="hint">"결과 보기"를 누르면 순위가 표시됩니다.</div>
-        <ol id="rankList" class="rank-list" hidden></ol>
+        <div id="rankEmpty" class="hint">“결과 보기 (순위)” 버튼을 누르면 순위가 나타납니다.</div>
+        <ol id="rankList" class="rank-list is-hidden"></ol>
       </section>
     </main>
 
-    <!-- 사다리 화면 -->
-    <main id="ladderView" class="view hidden">
-      <section class="card">
+    <!-- 사다리 뷰 -->
+    <main id="ladderView" class="view is-hidden">
+      <section class="card card--ladder">
         <div class="ladder__header">
-          <h2>사다리타기 (1→5팀이 차례로 진행)</h2>
-          <div class="ladder__actions">
-            <button id="backToMainBtn" class="btn outline">← 점수 화면</button>
-            <button id="regenBtn" class="btn subtle">사다리 새로 만들기</button>
+          <div>
+            <h2>사다리타기</h2>
+            <p class="hint">1~5 열에서 출발해 어디로 도착하는지 확인해보세요.</p>
+          </div>
+          <div class="ladder__header-actions">
+            <button id="btnBackMain" class="btn outline">← 점수 화면</button>
+            <button id="btnRegenLadder" class="btn subtle">사다리 새로 만들기</button>
           </div>
         </div>
 
-        <div class="svg-wrap clickable" title="클릭하면 다음 팀이 이동합니다">
+        <div class="svg-wrap" title="클릭하면 현재 팀이 이동합니다">
           <svg id="ladderSvg" width="760" height="560" role="img" aria-label="사다리"></svg>
         </div>
 
         <div class="ladder__controls">
-          <button id="stepBtn" class="btn primary">다음 팀 진행 (클릭/스페이스 가능)</button>
+          <button id="btnLadderStep" class="btn primary">다음 팀 진행 (클릭 / 스페이스)</button>
           <span id="ladderHint" class="hint">현재 대기: 팀 1</span>
         </div>
 
-        <div class="two-col">
+        <div class="ladder__bottom-grid">
           <div class="mini-card">
-            <h3>도착 순서 (왼→오)</h3>
+            <h3>도착 순서 (왼쪽 → 오른쪽)</h3>
             <ol id="ladderOrder" class="ordered-list"></ol>
           </div>
           <div class="mini-card">
-            <h3>매핑 (출발 열 → 도착 열)</h3>
+            <h3>출발 열 → 도착 열 매핑</h3>
             <div id="mappingGrid" class="mapping-grid"></div>
           </div>
         </div>
@@ -150,218 +159,273 @@
     </main>
   </div>
 
+  <!-- ====================
+       자바스크립트
+  ===================== -->
   <script>
-    // ============ LocalStorage keys ============
-    const LS_TEAMS = 'teams';
-    const LS_NAMES_SET = 'teamNamesSet';
+    // ---- LocalStorage 키 ----
+    const LS_KEY_TEAMS = 'u13_teams';
+    const LS_KEY_NAMES_SET = 'u13_teamNamesSet';
 
-    // ============ 데이터 & 상태 ============
-    const teams = [
-      { id: 1, name: '팀 1', score: 0 },
-      { id: 2, name: '팀 2', score: 0 },
-      { id: 3, name: '팀 3', score: 0 },
-      { id: 4, name: '팀 4', score: 0 },
-      { id: 5, name: '팀 5', score: 0 },
-    ];
+    const TEAM_COUNT = 5;
 
-    // 저장된 데이터 로드
-    (function loadFromStorage(){
-      const saved = localStorage.getItem(LS_TEAMS);
-      if (saved) {
-        try {
-          const arr = JSON.parse(saved);
-          if (Array.isArray(arr) && arr.length === 5) {
-            for (let i=0;i<5;i++){
-              if (arr[i]) {
-                teams[i].name  = String(arr[i].name ?? teams[i].name);
-                teams[i].score = Number(arr[i].score ?? 0);
-              }
-            }
-          }
-        } catch {}
+    // ---- 팀 데이터 ----
+    const teams = Array.from({ length: TEAM_COUNT }, (_, i) => ({
+      id: i + 1,
+      name: `팀 ${i + 1}`,
+      score: 0,
+    }));
+
+    // ---- 저장된 데이터 불러오기 ----
+    (function loadTeamsFromStorage() {
+      const saved = localStorage.getItem(LS_KEY_TEAMS);
+      if (!saved) return;
+      try {
+        const arr = JSON.parse(saved);
+        if (Array.isArray(arr) && arr.length === TEAM_COUNT) {
+          arr.forEach((t, idx) => {
+            if (!t) return;
+            if (typeof t.name === 'string') teams[idx].name = t.name;
+            if (typeof t.score === 'number') teams[idx].score = t.score;
+          });
+        }
+      } catch (e) {
+        // 파싱 실패 시 무시
       }
     })();
 
-    function saveToStorage(){
-      localStorage.setItem(LS_TEAMS, JSON.stringify(teams));
+    function saveTeams() {
+      localStorage.setItem(LS_KEY_TEAMS, JSON.stringify(teams));
     }
 
-    // ========= DOM 캐시 =========
+    // ---- 공통 DOM 캐시 ----
     const mainView = document.getElementById('mainView');
     const ladderView = document.getElementById('ladderView');
 
     // 모달
-    const nameModal = document.getElementById('nameModal');
-    const nameLabel = document.getElementById('nameLabel');
+    const teamModal = document.getElementById('teamModal');
+    const teamModalLabel = document.getElementById('teamModalLabel');
     const teamNameInput = document.getElementById('teamNameInput');
-    const nameNextBtn = document.getElementById('nameNextBtn');
-    let nameStep = 1;
+    const teamModalNext = document.getElementById('teamModalNext');
+    let modalStep = 0; // 0~4 사용
 
-    // 점수 화면
-    const teamButtonsWrap = document.getElementById('teamButtons');
-    const deltaInput = document.getElementById('deltaInput');
-    const addBtn = document.getElementById('addBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const renameBtn = document.getElementById('renameBtn');
-    const scoreTableBody = document.querySelector('tbody#scoreTable');
-    const showResultBtn = document.getElementById('showResultBtn');
-    const resultHint = document.getElementById('resultHint');
+    // 점수 / 순위 DOM
+    const teamChipWrap = document.getElementById('teamChipWrap');
+    const scoreDeltaInput = document.getElementById('scoreDelta');
+    const btnAddScore = document.getElementById('btnAddScore');
+    const btnResetScore = document.getElementById('btnResetScore');
+    const btnRenameTeams = document.getElementById('btnRenameTeams');
+    const scoreTableBody = document.getElementById('scoreTableBody');
+    const btnShowRank = document.getElementById('btnShowRank');
+    const rankHint = document.getElementById('rankHint');
     const rankEmpty = document.getElementById('rankEmpty');
     const rankList = document.getElementById('rankList');
-    const gotoLadderBtn = document.getElementById('gotoLadderBtn');
 
-    // 타이머 / 스탑워치 DOM
+    // 타이머 DOM
     const modeStopwatchBtn = document.getElementById('modeStopwatch');
     const modeCountdownBtn = document.getElementById('modeCountdown');
     const timerDisplay = document.getElementById('timerDisplay');
-    const timerInputs = document.getElementById('timerInputs');
+    const timerInputRow = document.getElementById('timerInputRow');
     const timerMinInput = document.getElementById('timerMin');
     const timerSecInput = document.getElementById('timerSec');
-    const timerStartBtn = document.getElementById('timerStartBtn');
-    const timerPauseBtn = document.getElementById('timerPauseBtn');
-    const timerResetBtn = document.getElementById('timerResetBtn');
+    const btnTimerStart = document.getElementById('btnTimerStart');
+    const btnTimerPause = document.getElementById('btnTimerPause');
+    const btnTimerReset = document.getElementById('btnTimerReset');
 
-    // 사다리 화면
+    const btnGotoLadder = document.getElementById('btnGotoLadder');
+
+    // 사다리 DOM
     const ladderSvg = document.getElementById('ladderSvg');
-    const backToMainBtn = document.getElementById('backToMainBtn');
-    const regenBtn = document.getElementById('regenBtn');
-    const stepBtn = document.getElementById('stepBtn');
+    const btnBackMain = document.getElementById('btnBackMain');
+    const btnRegenLadder = document.getElementById('btnRegenLadder');
+    const btnLadderStep = document.getElementById('btnLadderStep');
     const ladderHint = document.getElementById('ladderHint');
     const ladderOrder = document.getElementById('ladderOrder');
     const mappingGrid = document.getElementById('mappingGrid');
 
-    // 점수 상태
+    // ---- 점수 상태 ----
     let selectedTeamId = 1;
 
-    // 타이머 상태
+    // ---- 타이머 상태 ----
     let timerMode = 'stopwatch'; // 'stopwatch' | 'countdown'
     let timerInterval = null;
+    let elapsedMs = 0;           // 스탑워치에서 사용
+    let remainingMs = 0;         // 타이머에서 사용
     let stopwatchStart = null;
-    let elapsedMs = 0;
-
     let countdownStart = null;
     let initialCountdownMs = 0;
-    let remainingMs = 0;
 
-    // 사다리 상태
-    const cols = 5;
-    const width = 760, height = 560;
-    const paddingX = 60, topY = 20, bottomY = height - 20;
-    const colGap = (width - paddingX * 2) / (cols - 1);
-    const xPositions = Array.from({length: cols}, (_,i)=> paddingX + i*colGap);
-    let rungs = [], paths = [];
-    let animIdx = -1, currentStarter = 0, progress = 0, rafId = null;
+    // ---- 사다리 상태 ----
+    const LADDER_COLS = 5;
+    const LADDER_WIDTH = 760;
+    const LADDER_HEIGHT = 560;
+    const PAD_X = 70;
+    const TOP_Y = 30;
+    const BOTTOM_Y = LADDER_HEIGHT - 30;
+    const COL_GAP = (LADDER_WIDTH - PAD_X * 2) / (LADDER_COLS - 1);
+    const X_POSITIONS = Array.from({ length: LADDER_COLS }, (_, i) => PAD_X + i * COL_GAP);
 
-    // ======= 모달 로직 (팀명 1→5 입력) =======
-    function openNameModal(){
-      nameStep = 1;
+    let rungs = [];
+    let paths = [];
+    let currentStarter = 0; // 0~4
+    let currentAnimIndex = -1;
+    let progress = 0;
+    let rafId = null;
+
+    // =========================
+    // 팀명 입력 모달
+    // =========================
+    function openTeamModal() {
+      modalStep = 0;
+      updateModalLabel();
       teamNameInput.value = '';
-      nameLabel.textContent = `팀 ${nameStep} 이름`;
-      nameModal.classList.add('show');
-      teamNameInput.focus();
+      teamModal.classList.add('is-open');
+      setTimeout(() => teamNameInput.focus(), 0);
     }
-    function closeNameModal(){ nameModal.classList.remove('show'); }
 
-    function commitName(){
+    function closeTeamModal() {
+      teamModal.classList.remove('is-open');
+    }
+
+    function updateModalLabel() {
+      teamModalLabel.textContent = `팀 ${modalStep + 1} 이름`;
+    }
+
+    function submitTeamName() {
       const name = teamNameInput.value.trim();
-      if(!name) return;
-      teams[nameStep-1].name = name;
-      saveToStorage();
-      nameStep++;
-      if(nameStep <= 5){
+      if (!name) return;
+      teams[modalStep].name = name;
+      saveTeams();
+
+      modalStep += 1;
+      if (modalStep < TEAM_COUNT) {
         teamNameInput.value = '';
-        nameLabel.textContent = `팀 ${nameStep} 이름`;
+        updateModalLabel();
         teamNameInput.focus();
-        renderTeamButtons(); renderScores();
-      }else{
-        closeNameModal();
-        localStorage.setItem(LS_NAMES_SET, 'true');
-        renderTeamButtons(); renderScores(); buildLadder();
+        renderTeamChips();
+        renderScoreTable();
+        drawLadder();   // 팀 이름이 바뀌면 상단 라벨도 갱신
+      } else {
+        closeTeamModal();
+        localStorage.setItem(LS_KEY_NAMES_SET, '1');
+        renderTeamChips();
+        renderScoreTable();
+        buildLadder();
       }
     }
-    nameNextBtn.addEventListener('click', commitName);
-    teamNameInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter') commitName(); });
 
-    if(localStorage.getItem(LS_NAMES_SET) === 'true'){
-      nameModal.classList.remove('show'); // 저장된 이름 활용
-    }else{
-      openNameModal();
+    teamModalNext.addEventListener('click', submitTeamName);
+    teamNameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitTeamName();
+    });
+
+    if (localStorage.getItem(LS_KEY_NAMES_SET) === '1') {
+      teamModal.classList.remove('is-open');
+    } else {
+      openTeamModal();
     }
 
-    // ======= 점수 로직 =======
-    function renderTeamButtons(){
-      teamButtonsWrap.innerHTML = '';
-      teams.forEach(t=>{
+    // =========================
+    // 점수 관련 렌더링
+    // =========================
+    function renderTeamChips() {
+      teamChipWrap.innerHTML = '';
+      teams.forEach(t => {
         const btn = document.createElement('button');
-        btn.className = 'chip' + (t.id===selectedTeamId ? ' chip--active':'');
+        btn.className = 'chip chip--team' + (t.id === selectedTeamId ? ' chip--active' : '');
         btn.textContent = t.name;
-        btn.addEventListener('click', ()=>{ selectedTeamId = t.id; renderTeamButtons(); });
-        teamButtonsWrap.appendChild(btn);
+        btn.addEventListener('click', () => {
+          selectedTeamId = t.id;
+          renderTeamChips();
+        });
+        teamChipWrap.appendChild(btn);
       });
     }
 
-    function renderScores(){
+    function renderScoreTable() {
       scoreTableBody.innerHTML = '';
-      teams.forEach(t=>{
+      teams.forEach(t => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${t.name}</td><td class="score">${t.score}</td>`;
+        tr.innerHTML = `
+          <td>${t.name}</td>
+          <td class="score-cell">${t.score}</td>
+        `;
         scoreTableBody.appendChild(tr);
       });
     }
 
-    function addScore(){
-      const val = Number(deltaInput.value);
-      const team = teams.find(x=>x.id===selectedTeamId);
-      if(!team) return;
-      team.score += Number.isFinite(val) ? val : 0;
-      saveToStorage();
-      renderScores();
+    function applyScore() {
+      const team = teams.find(t => t.id === selectedTeamId);
+      if (!team) return;
+      const delta = Number(scoreDeltaInput.value);
+      const validDelta = Number.isFinite(delta) ? delta : 0;
+      team.score += validDelta;
+      saveTeams();
+      renderScoreTable();
     }
 
-    function resetScores(){
-      teams.forEach(t=> t.score = 0);
-      saveToStorage();
-      renderScores();
+    function resetScores() {
+      teams.forEach(t => t.score = 0);
+      saveTeams();
+      renderScoreTable();
       hideRanking();
     }
 
-    function showRanking(){
-      const sorted = [...teams].sort((a,b)=> b.score - a.score || a.id - b.id);
+    function showRanking() {
+      const sorted = [...teams].sort((a, b) => b.score - a.score || a.id - b.id);
       rankList.innerHTML = '';
-      sorted.forEach((t,i)=>{
+      sorted.forEach((t, idx) => {
         const li = document.createElement('li');
-        li.innerHTML = `<span class="badge">${i+1}</span> <span>${t.name}</span> <span class="pts">${t.score}점</span>`;
+        li.innerHTML = `
+          <span class="rank-badge">${idx + 1}</span>
+          <span class="rank-team">${t.name}</span>
+          <span class="rank-score">${t.score}점</span>
+        `;
         rankList.appendChild(li);
       });
-      rankEmpty.hidden = true; rankList.hidden = false; resultHint.hidden = false;
+      rankEmpty.classList.add('is-hidden');
+      rankList.classList.remove('is-hidden');
+      rankHint.classList.remove('is-hidden');
     }
-    function hideRanking(){ rankList.hidden=false; rankList.hidden=true; rankEmpty.hidden=false; resultHint.hidden=true; }
 
-    // 프리셋 클릭
-    document.addEventListener('click', (e)=>{
+    function hideRanking() {
+      rankList.classList.add('is-hidden');
+      rankEmpty.classList.remove('is-hidden');
+      rankHint.classList.add('is-hidden');
+    }
+
+    // 프리셋 점수 버튼
+    document.addEventListener('click', (e) => {
       const el = e.target.closest('[data-delta]');
-      if(!el) return;
-      deltaInput.value = el.getAttribute('data-delta');
+      if (!el) return;
+      scoreDeltaInput.value = el.getAttribute('data-delta');
     });
 
-    // 버튼 이벤트
-    addBtn.addEventListener('click', addScore);
-    resetBtn.addEventListener('click', resetScores);
-    showResultBtn.addEventListener('click', showRanking);
-    renameBtn.addEventListener('click', ()=>{
-      localStorage.removeItem(LS_NAMES_SET);
-      openNameModal();
+    btnAddScore.addEventListener('click', applyScore);
+    btnResetScore.addEventListener('click', resetScores);
+    btnShowRank.addEventListener('click', showRanking);
+    btnRenameTeams.addEventListener('click', () => {
+      localStorage.removeItem(LS_KEY_NAMES_SET);
+      openTeamModal();
     });
 
-    // ======= 타이머 / 스탑워치 로직 =======
-    function formatTime(ms){
-      const totalSec = Math.floor(ms / 1000);
+    // =========================
+    // 타이머 / 스탑워치
+    // =========================
+    function formatTime(ms) {
+      const totalMs = Math.max(0, Math.floor(ms));
+      const totalSec = Math.floor(totalMs / 1000);
       const min = Math.floor(totalSec / 60);
       const sec = totalSec % 60;
-      return `${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+      const milli = totalMs % 1000;
+
+      const mm = String(min).padStart(2, '0');
+      const ss = String(sec).padStart(2, '0');
+      const mmm = String(milli).padStart(3, '0');
+      return `${mm}:${ss}.${mmm}`;
     }
 
-    function updateTimerDisplay(){
+    function updateTimerDisplay() {
       if (timerMode === 'stopwatch') {
         timerDisplay.textContent = formatTime(elapsedMs);
       } else {
@@ -369,14 +433,14 @@
       }
     }
 
-    function clearTimerInterval(){
-      if (timerInterval !== null){
+    function clearTimerInterval() {
+      if (timerInterval !== null) {
         clearInterval(timerInterval);
         timerInterval = null;
       }
     }
 
-    function setTimerMode(mode){
+    function setTimerMode(mode) {
       if (timerMode === mode) return;
       timerMode = mode;
       clearTimerInterval();
@@ -386,34 +450,33 @@
       countdownStart = null;
       updateTimerDisplay();
 
-      if (mode === 'stopwatch'){
+      if (mode === 'stopwatch') {
         modeStopwatchBtn.classList.add('chip--active');
         modeCountdownBtn.classList.remove('chip--active');
-        timerInputs.style.display = 'none';
+        timerInputRow.classList.add('is-hidden');
       } else {
         modeCountdownBtn.classList.add('chip--active');
         modeStopwatchBtn.classList.remove('chip--active');
-        timerInputs.style.display = 'flex';
+        timerInputRow.classList.remove('is-hidden');
       }
     }
 
-    modeStopwatchBtn.addEventListener('click', ()=> setTimerMode('stopwatch'));
-    modeCountdownBtn.addEventListener('click', ()=> setTimerMode('countdown'));
+    modeStopwatchBtn.addEventListener('click', () => setTimerMode('stopwatch'));
+    modeCountdownBtn.addEventListener('click', () => setTimerMode('countdown'));
 
-    function startTimer(){
-      if (timerInterval !== null) return; // 이미 동작 중이면 무시
+    function startTimer() {
+      if (timerInterval !== null) return;
 
-      if (timerMode === 'stopwatch'){
+      if (timerMode === 'stopwatch') {
         const now = performance.now();
         stopwatchStart = now - elapsedMs;
-        timerInterval = setInterval(()=>{
+        timerInterval = setInterval(() => {
           const t = performance.now();
           elapsedMs = t - stopwatchStart;
           updateTimerDisplay();
-        }, 50);
+        }, 16); // ~60fps
       } else {
-        // countdown
-        if (remainingMs <= 0){
+        if (remainingMs <= 0) {
           const min = Math.max(0, Number(timerMinInput.value) || 0);
           let sec = Math.max(0, Number(timerSecInput.value) || 0);
           if (sec > 59) sec = 59;
@@ -421,31 +484,29 @@
           remainingMs = initialCountdownMs;
         }
         if (remainingMs <= 0) {
-          // 0초면 동작 X
           updateTimerDisplay();
           return;
         }
         const now = performance.now();
         countdownStart = now;
         const startRemaining = remainingMs;
-        timerInterval = setInterval(()=>{
+        timerInterval = setInterval(() => {
           const t = performance.now();
           const diff = t - countdownStart;
           remainingMs = Math.max(0, startRemaining - diff);
           updateTimerDisplay();
-          if (remainingMs <= 0){
+          if (remainingMs <= 0) {
             clearTimerInterval();
           }
-        }, 50);
+        }, 16);
       }
     }
 
-    function pauseTimer(){
+    function pauseTimer() {
       clearTimerInterval();
-      // 현재까지 elapsedMs / remainingMs 그대로 유지
     }
 
-    function resetTimer(){
+    function resetTimer() {
       clearTimerInterval();
       elapsedMs = 0;
       remainingMs = 0;
@@ -454,197 +515,291 @@
       updateTimerDisplay();
     }
 
-    timerStartBtn.addEventListener('click', startTimer);
-    timerPauseBtn.addEventListener('click', pauseTimer);
-    timerResetBtn.addEventListener('click', resetTimer);
+    btnTimerStart.addEventListener('click', startTimer);
+    btnTimerPause.addEventListener('click', pauseTimer);
+    btnTimerReset.addEventListener('click', resetTimer);
 
-    // 초기 상태: 스탑워치 모드, 입력창 숨기기
-    timerInputs.style.display = 'none';
+    timerInputRow.classList.add('is-hidden');
     updateTimerDisplay();
 
-    // ======= 화면 전환 =======
-    gotoLadderBtn.addEventListener('click', ()=>{
-      mainView.classList.add('hidden');
-      ladderView.classList.remove('hidden');
-      drawLadder(); updateLadderPanels();
-      currentStarter = 0; animIdx = -1; progress = 0; updateLadderHint();
-    });
-    backToMainBtn.addEventListener('click', ()=>{
-      ladderView.classList.add('hidden');
-      mainView.classList.remove('hidden');
-      stopAnim();
+    // =========================
+    // 화면 전환
+    // =========================
+    btnGotoLadder.addEventListener('click', () => {
+      mainView.classList.add('is-hidden');
+      ladderView.classList.remove('is-hidden');
+      stopLadderAnim();
+      buildLadder();
+      currentStarter = 0;
+      updateLadderHint();
     });
 
-    // ======= 사다리 생성/계산 =======
-    function generateRungs({ cols, height, minGap=28, density=0.16 }){
+    btnBackMain.addEventListener('click', () => {
+      ladderView.classList.add('is-hidden');
+      mainView.classList.remove('is-hidden');
+      stopLadderAnim();
+    });
+
+    // =========================
+    // 사다리 생성 & 계산
+    // =========================
+    function generateRungs({ cols, height, minGap = 28, density = 0.16 }) {
       const all = [];
-      const maxRungs = Math.floor((height*density)/2)+12;
-      for(let c=0;c<cols-1;c++){
-        const local=[]; let tries=0;
-        while(local.length < Math.floor(maxRungs/(cols-1)) && tries<2000){
+      const maxRungs = Math.floor((height * density) / 2) + 12;
+
+      for (let c = 0; c < cols - 1; c++) {
+        const local = [];
+        let tries = 0;
+        while (local.length < Math.floor(maxRungs / (cols - 1)) && tries < 2000) {
           tries++;
-          const y = 40 + Math.random()*(height-80);
-          if(local.every(yy=> Math.abs(yy-y)>=minGap)) local.push(y);
+          const y = 50 + Math.random() * (height - 100);
+          if (local.every(yy => Math.abs(yy - y) >= minGap)) {
+            local.push(y);
+          }
         }
-        local.sort((a,b)=>a-b);
-        local.forEach(y=> all.push({y, leftCol:c}));
+        local.sort((a, b) => a - b);
+        local.forEach(y => all.push({ y, leftCol: c }));
       }
-      all.sort((a,b)=> a.y - b.y || a.leftCol - b.leftCol);
-      const filtered=[];
-      for(let i=0;i<all.length;i++){
-        const cur=all[i], prev=filtered[filtered.length-1];
-        if(!prev || Math.abs(prev.y-cur.y)>8 || Math.abs(prev.leftCol-cur.leftCol)>1) filtered.push(cur);
+
+      all.sort((a, b) => a.y - b.y || a.leftCol - b.leftCol);
+
+      const filtered = [];
+      for (let i = 0; i < all.length; i++) {
+        const cur = all[i];
+        const prev = filtered[filtered.length - 1];
+        if (!prev || Math.abs(prev.y - cur.y) > 8 || Math.abs(prev.leftCol - cur.leftCol) > 1) {
+          filtered.push(cur);
+        }
       }
       return filtered;
     }
 
-    function computeMapping(cols, r){
-      return Array.from({length: cols}, (_,start)=>{
-        let col=start;
-        for(const rung of r){
-          if(rung.leftCol===col) col=col+1;
-          else if(rung.leftCol+1===col) col=col-1;
+    function computeMapping(cols, r) {
+      return Array.from({ length: cols }, (_, start) => {
+        let col = start;
+        for (const rung of r) {
+          if (rung.leftCol === col) col = col + 1;
+          else if (rung.leftCol + 1 === col) col = col - 1;
         }
         return col;
       });
     }
 
-    function pathForStart(start){
-      let col=start; const pts=[{x:xPositions[col], y:topY}];
-      for(const rung of rungs){
-        const y=rung.y; pts.push({x:xPositions[col], y});
-        if(rung.leftCol===col){ pts.push({x:xPositions[col+1], y}); col=col+1; }
-        else if(rung.leftCol+1===col){ pts.push({x:xPositions[col-1], y}); col=col-1; }
+    function buildPathForStart(startCol) {
+      let col = startCol;
+      const pts = [{ x: X_POSITIONS[col], y: TOP_Y }];
+      for (const rung of rungs) {
+        const y = rung.y;
+        pts.push({ x: X_POSITIONS[col], y });
+        if (rung.leftCol === col) {
+          pts.push({ x: X_POSITIONS[col + 1], y });
+          col = col + 1;
+        } else if (rung.leftCol + 1 === col) {
+          pts.push({ x: X_POSITIONS[col - 1], y });
+          col = col - 1;
+        }
       }
-      pts.push({x:xPositions[col], y:bottomY});
+      pts.push({ x: X_POSITIONS[col], y: BOTTOM_Y });
       return pts;
     }
 
-    // ======= 사다리 렌더링 =======
-    function drawLadder(){
-      ladderSvg.innerHTML='';
-      // 라벨
-      xPositions.forEach((x,i)=>{
-        const top = document.createElementNS('http://www.w3.org/2000/svg','text');
-        top.setAttribute('x',x); top.setAttribute('y',16); top.setAttribute('text-anchor','middle');
-        top.setAttribute('class','svg-top'); top.textContent = teams[i].name; ladderSvg.appendChild(top);
+    function polylineProgressPoints(points, p) {
+      if (!points || points.length < 2) return points || [];
+      const segLens = [];
+      let total = 0;
+      for (let i = 0; i < points.length - 1; i++) {
+        const dx = points[i + 1].x - points[i].x;
+        const dy = points[i + 1].y - points[i].y;
+        const L = Math.hypot(dx, dy);
+        segLens.push(L);
+        total += L;
+      }
+      const target = total * p;
+      let acc = 0;
+      const out = [points[0]];
+      for (let i = 0; i < segLens.length; i++) {
+        const L = segLens[i];
+        const a = points[i];
+        const b = points[i + 1];
+        if (acc + L <= target) {
+          out.push(b);
+          acc += L;
+        } else {
+          const r = Math.max(0, Math.min(1, (target - acc) / L));
+          out.push({
+            x: a.x + (b.x - a.x) * r,
+            y: a.y + (b.y - a.y) * r
+          });
+          break;
+        }
+      }
+      return out;
+    }
 
-        const bottom = document.createElementNS('http://www.w3.org/2000/svg','text');
-        bottom.setAttribute('x',x); bottom.setAttribute('y',height-6); bottom.setAttribute('text-anchor','middle');
-        bottom.setAttribute('class','svg-bottom'); bottom.textContent = `출발 ${i+1}`; ladderSvg.appendChild(bottom);
+    // =========================
+    // 사다리 렌더링
+    // =========================
+    function drawLadder() {
+      ladderSvg.innerHTML = '';
+
+      // 상단 팀 이름
+      X_POSITIONS.forEach((x, i) => {
+        const textTop = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        textTop.setAttribute('x', x);
+        textTop.setAttribute('y', 18);
+        textTop.setAttribute('text-anchor', 'middle');
+        textTop.setAttribute('class', 'svg-top-label');
+        textTop.textContent = teams[i].name;
+        ladderSvg.appendChild(textTop);
+
+        const textBottom = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        textBottom.setAttribute('x', x);
+        textBottom.setAttribute('y', LADDER_HEIGHT - 6);
+        textBottom.setAttribute('text-anchor', 'middle');
+        textBottom.setAttribute('class', 'svg-bottom-label');
+        textBottom.textContent = `출발 ${i + 1}`;
+        ladderSvg.appendChild(textBottom);
       });
+
       // 세로줄
-      xPositions.forEach((x)=>{
-        const v = document.createElementNS('http://www.w3.org/2000/svg','line');
-        v.setAttribute('x1',x); v.setAttribute('x2',x); v.setAttribute('y1',topY); v.setAttribute('y2',bottomY);
-        v.setAttribute('stroke','#94a3b8'); v.setAttribute('stroke-width','3');
-        ladderSvg.appendChild(v);
+      X_POSITIONS.forEach((x) => {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x);
+        line.setAttribute('x2', x);
+        line.setAttribute('y1', TOP_Y);
+        line.setAttribute('y2', BOTTOM_Y);
+        line.setAttribute('class', 'svg-vertical');
+        ladderSvg.appendChild(line);
       });
+
       // 가로줄
-      rungs.forEach(r=>{
-        const h = document.createElementNS('http://www.w3.org/2000/svg','line');
-        h.setAttribute('x1',xPositions[r.leftCol]); h.setAttribute('x2',xPositions[r.leftCol+1]);
-        h.setAttribute('y1',r.y); h.setAttribute('y2',r.y);
-        h.setAttribute('stroke','#0ea5e9'); h.setAttribute('stroke-width','4'); h.setAttribute('stroke-linecap','round');
-        ladderSvg.appendChild(h);
+      rungs.forEach(r => {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', X_POSITIONS[r.leftCol]);
+        line.setAttribute('x2', X_POSITIONS[r.leftCol + 1]);
+        line.setAttribute('y1', r.y);
+        line.setAttribute('y2', r.y);
+        line.setAttribute('class', 'svg-rung');
+        ladderSvg.appendChild(line);
       });
     }
 
-    function drawProgressPolyline(points){
-      const poly = document.createElementNS('http://www.w3.org/2000/svg','polyline');
-      poly.setAttribute('fill','none'); poly.setAttribute('class','path');
-      poly.setAttribute('points', points.map(p=>`${p.x},${p.y}`).join(' '));
+    function drawProgressPolyline(points) {
+      const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+      poly.setAttribute('fill', 'none');
+      poly.setAttribute('points', points.map(p => `${p.x},${p.y}`).join(' '));
+      poly.setAttribute('class', 'svg-path');
       ladderSvg.appendChild(poly);
       return poly;
     }
 
-    function updateLadderPanels(){
-      const mapping = computeMapping(cols, rungs);
-      // 매핑 그리드
-      mappingGrid.innerHTML='';
-      mapping.forEach((endCol, start)=>{
-        const cell = document.createElement('div');
-        cell.className='map-cell';
-        cell.innerHTML = `<div class="map-name">${teams[start].name}</div><div class="map-arrow">${start+1} → ${endCol+1}</div>`;
-        mappingGrid.appendChild(cell);
+    function updateLadderPanels() {
+      const mapping = computeMapping(LADDER_COLS, rungs);
+
+      // 출발 → 도착 매핑
+      mappingGrid.innerHTML = '';
+      mapping.forEach((endCol, startCol) => {
+        const div = document.createElement('div');
+        div.className = 'map-cell';
+        div.innerHTML = `
+          <div class="map-team">${teams[startCol].name}</div>
+          <div class="map-arrow">${startCol + 1} → ${endCol + 1}</div>
+        `;
+        mappingGrid.appendChild(div);
       });
-      // 도착 순서(왼→오)
-      const pairs = Array.from({length:cols},(_,start)=>({start, end:mapping[start]}));
-      pairs.sort((a,b)=> a.end - b.end);
-      ladderOrder.innerHTML='';
-      pairs.forEach((p,rank)=>{
+
+      // 도착 순서 (왼→오)
+      const pairs = Array.from({ length: LADDER_COLS }, (_, start) => ({
+        start,
+        end: mapping[start],
+      }));
+      pairs.sort((a, b) => a.end - b.end);
+      ladderOrder.innerHTML = '';
+      pairs.forEach((p, idx) => {
         const li = document.createElement('li');
-        li.innerHTML = `<span class="rank">${rank+1}</span> <span>${teams[p.start].name}</span>`;
+        li.innerHTML = `<span class="order-rank">${idx + 1}</span> ${teams[p.start].name}`;
         ladderOrder.appendChild(li);
       });
     }
 
-    // ======= 한 팀씩 애니메이션 =======
-    function updateLadderHint(){
-      ladderHint.textContent = currentStarter < cols ? `현재 대기: ${teams[currentStarter].name}` : '완료! 모두 이동했습니다.';
+    function updateLadderHint() {
+      if (currentStarter >= LADDER_COLS) {
+        ladderHint.textContent = '모든 팀 이동 완료!';
+      } else {
+        ladderHint.textContent = `현재 대기: ${teams[currentStarter].name}`;
+      }
     }
 
-    function startOneRun(){
-      if(currentStarter >= cols) return;
-      if(animIdx !== -1) return;
-      animIdx = currentStarter; progress = 0; tick.t0 = null; tick();
-    }
-
-    function stopAnim(){ cancelAnimationFrame(rafId); animIdx=-1; progress=0; drawLadder(); }
-
-    function tick(ts){
-      const DUR = 1200;
-      if(animIdx < 0) return;
-      if(!tick.t0) tick.t0 = ts || performance.now();
-      const dt = (ts || performance.now()) - tick.t0;
-      progress = Math.min(1, dt / DUR);
+    // ---- 애니메이션 ----
+    function stopLadderAnim() {
+      cancelAnimationFrame(rafId);
+      currentAnimIndex = -1;
+      progress = 0;
       drawLadder();
-      const pts = polylineProgressPoints(paths[animIdx], progress);
+    }
+
+    function tick(ts) {
+      const DURATION = 1200;
+      if (currentAnimIndex < 0) return;
+      if (!tick.startTime) tick.startTime = ts || performance.now();
+      const dt = (ts || performance.now()) - tick.startTime;
+      progress = Math.min(1, dt / DURATION);
+
+      drawLadder();
+      const pts = polylineProgressPoints(paths[currentAnimIndex], progress);
       drawProgressPolyline(pts);
-      if(progress >= 1){
-        tick.t0 = null; animIdx = -1; currentStarter++;
-        updateLadderPanels(); updateLadderHint();
+
+      if (progress >= 1) {
+        tick.startTime = null;
+        currentAnimIndex = -1;
+        currentStarter += 1;
+        updateLadderPanels();
+        updateLadderHint();
         return;
       }
       rafId = requestAnimationFrame(tick);
     }
 
-    stepBtn.addEventListener('click', startOneRun);
-    ladderSvg.addEventListener('click', startOneRun);
-    document.addEventListener('keydown', (e)=>{
-      if(!ladderView.classList.contains('hidden') && e.code==='Space'){
-        e.preventDefault(); startOneRun();
+    function startOneLadderRun() {
+      if (currentStarter >= LADDER_COLS) return;
+      if (currentAnimIndex !== -1) return;
+      currentAnimIndex = currentStarter;
+      progress = 0;
+      tick.startTime = null;
+      tick();
+    }
+
+    btnLadderStep.addEventListener('click', startOneLadderRun);
+    ladderSvg.addEventListener('click', startOneLadderRun);
+    document.addEventListener('keydown', (e) => {
+      if (ladderView.classList.contains('is-hidden')) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        startOneLadderRun();
       }
     });
 
-    // ======= 초기화/재생성 =======
-    function polylineProgressPoints(points, p){
-      if(!points || points.length<2) return points||[];
-      const segLens=[]; let total=0;
-      for(let i=0;i<points.length-1;i++){
-        const dx=points[i+1].x-points[i].x, dy=points[i+1].y-points[i].y;
-        const L=Math.hypot(dx,dy); segLens.push(L); total+=L;
-      }
-      const target = total*p; let acc=0; const out=[points[0]];
-      for(let i=0;i<segLens.length;i++){
-        const L=segLens[i], a=points[i], b=points[i+1];
-        if(acc+L<=target){ out.push(b); acc+=L; }
-        else { const r=Math.max(0,Math.min(1,(target-acc)/L));
-          out.push({x:a.x+(b.x-a.x)*r, y:a.y+(b.y-a.y)*r}); break; }
-      }
-      return out;
+    btnRegenLadder.addEventListener('click', () => {
+      stopLadderAnim();
+      buildLadder();
+      currentStarter = 0;
+      updateLadderHint();
+    });
+
+    function buildLadder() {
+      rungs = generateRungs({ cols: LADDER_COLS, height: LADDER_HEIGHT });
+      paths = Array.from({ length: LADDER_COLS }, (_, i) => buildPathForStart(i));
+      drawLadder();
+      updateLadderPanels();
     }
 
-    function buildLadder(){
-      rungs = generateRungs({ cols, height: height-40, density: 0.16 });
-      paths = Array.from({length: cols}, (_,s)=> pathForStart(s));
-      drawLadder(); updateLadderPanels();
-      currentStarter = 0; updateLadderHint();
-    }
-    regenBtn.addEventListener('click', ()=>{ stopAnim(); buildLadder(); });
-
-    // ======= 최초 렌더 =======
-    renderTeamButtons(); renderScores(); buildLadder();
+    // =========================
+    // 최초 렌더링
+    // =========================
+    renderTeamChips();
+    renderScoreTable();
+    buildLadder();
+    updateLadderHint();
   </script>
 </body>
 </html>
